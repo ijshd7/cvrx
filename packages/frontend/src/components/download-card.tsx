@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, BookOpen } from "lucide-react";
+import { Download, FileText, BookOpen, Mail } from "lucide-react";
 import type { GenerateResponse } from "@cvrx/shared";
 import { getDownloadUrl } from "@/lib/api";
 
@@ -24,7 +24,7 @@ export function DownloadCard({ result }: DownloadCardProps) {
       <CardHeader>
         <CardTitle>Your Documents Are Ready</CardTitle>
         <CardDescription>
-          Download your tailored resume and CV below.
+          Download your tailored resume, CV, and cover letter below.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col sm:flex-row gap-4">
@@ -47,6 +47,17 @@ export function DownloadCard({ result }: DownloadCardProps) {
           <Button variant="outline" className="w-full gap-2" size="lg">
             <BookOpen className="h-5 w-5" />
             <span>CV ({ext})</span>
+            <Download className="h-4 w-4" />
+          </Button>
+        </a>
+        <a
+          href={getDownloadUrl(result.coverLetterDownloadUrl)}
+          download
+          className="flex-1"
+        >
+          <Button variant="outline" className="w-full gap-2" size="lg">
+            <Mail className="h-5 w-5" />
+            <span>Cover Letter ({ext})</span>
             <Download className="h-4 w-4" />
           </Button>
         </a>

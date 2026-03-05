@@ -6,7 +6,7 @@ import { upload } from "../middleware/upload";
 import { scrapeJobListing } from "../services/scraper";
 import { parseResume } from "../services/file-parser";
 import { generateContent } from "../services/openrouter";
-import { buildResumePrompt, buildCvPrompt } from "../services/prompt-builder";
+import { buildResumePrompt, buildCvPrompt, buildCoverLetterPrompt } from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
 import { ensureTempDir, getTempFilePath, writeTempFile } from "../utils/temp-files";
 
@@ -82,25 +82,31 @@ router.post(
       sendSSE(res, { step: "parsing", progress: 15, message: "Parsing resume..." });
       const resumeText = await parseResume(req.file.buffer, req.file.mimetype);
 
-      // Generate resume and CV in parallel
-      sendSSE(res, { step: "generating_resume", progress: 25, message: "Generating tailored resume..." });
+      // Generate resume, CV, and cover letter in parallel
+      sendSSE(res, { step: "generating_resume", progress: 20, message: "Generating tailored resume..." });
       const resumePrompt = buildResumePrompt(resumeText, finalJobDescription);
       const cvPrompt = buildCvPrompt(resumeText, finalJobDescription);
+      const coverLetterPrompt = buildCoverLetterPrompt(resumeText, finalJobDescription);
 
-      const [resumeContent, cvContent] = await Promise.all([
+      const [resumeContent, cvContent, coverLetterContent] = await Promise.all([
         generateContent(model, resumePrompt.system, resumePrompt.user).then((result) => {
-          sendSSE(res, { step: "generating_cv", progress: 50, message: "Generating cover letter..." });
+          sendSSE(res, { step: "generating_cv", progress: 35, message: "Generating CV..." });
           return result;
         }),
-        generateContent(model, cvPrompt.system, cvPrompt.user),
+        generateContent(model, cvPrompt.system, cvPrompt.user).then((result) => {
+          sendSSE(res, { step: "generating_cover_letter", progress: 50, message: "Generating cover letter..." });
+          return result;
+        }),
+        generateContent(model, coverLetterPrompt.system, coverLetterPrompt.user),
       ]);
 
       // Generate documents
-      sendSSE(res, { step: "building_documents", progress: 75, message: "Building documents..." });
+      sendSSE(res, { step: "building_documents", progress: 70, message: "Building documents..." });
       const format = outputFormat as OutputFormat;
-      const [resumeDoc, cvDoc] = await Promise.all([
+      const [resumeDoc, cvDoc, coverLetterDoc] = await Promise.all([
         generateDocument(resumeContent, format, "Resume"),
         generateDocument(cvContent, format, "Curriculum Vitae"),
+        generateDocument(coverLetterContent, format, "Cover Letter"),
       ]);
 
       // Save to temp directory
@@ -109,14 +115,17 @@ router.post(
 
       const resumePath = getTempFilePath(jobId, "resume", format);
       const cvPath = getTempFilePath(jobId, "cv", format);
+      const coverLetterPath = getTempFilePath(jobId, "cover_letter", format);
 
       writeTempFile(resumePath, resumeDoc);
       writeTempFile(cvPath, cvDoc);
+      writeTempFile(coverLetterPath, coverLetterDoc);
 
       const data: GenerateResponse = {
         jobId,
         resumeDownloadUrl: `/api/download/${jobId}/resume`,
         cvDownloadUrl: `/api/download/${jobId}/cv`,
+        coverLetterDownloadUrl: `/api/download/${jobId}/cover_letter`,
         outputFormat: format,
       };
 

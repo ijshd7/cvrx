@@ -1,6 +1,6 @@
 # CVRX
 
-AI-powered resume and CV generator. Provide a job listing and your existing resume, select a language model via [OpenRouter](https://openrouter.ai), and receive a tailored resume and comprehensive CV ready to download.
+AI-powered resume, CV, and cover letter generator. Provide a job listing and your existing resume, select a language model via [OpenRouter](https://openrouter.ai), and receive a tailored resume, comprehensive CV, and personalized cover letter ready to download.
 
 ## Demo
 
@@ -13,7 +13,7 @@ AI-powered resume and CV generator. Provide a job listing and your existing resu
 - **Model Selection** — Choose from any LLM available on OpenRouter (Claude, GPT-4, Llama, Gemini, etc.)
 - **Job Listing Scraping** — Paste a URL and the app scrapes the job description automatically, with a manual text fallback
 - **Multiple Upload Formats** — Upload your resume as PDF, DOCX, or plain text
-- **Two Output Documents** — Get both a concise, ATS-optimized resume and a comprehensive CV
+- **Three Output Documents** — Get a concise, ATS-optimized resume, a comprehensive CV, and a tailored cover letter
 - **PDF & DOCX Output** — Download your documents in either format
 - **Containerized** — Full Docker Compose setup for easy deployment
 
@@ -137,7 +137,7 @@ cvrx/
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/models` | List available OpenRouter models |
-| `POST` | `/api/generate` | Generate resume and CV (multipart form) |
+| `POST` | `/api/generate` | Generate resume, CV, and cover letter (multipart form) |
 | `GET` | `/api/download/:jobId/:docType?format=pdf\|docx` | Download generated document |
 | `GET` | `/api/health` | Health check |
 
@@ -147,8 +147,8 @@ cvrx/
 2. **Provide the job listing** via URL (auto-scraped) or paste the description manually
 3. **Upload your current resume** (PDF, DOCX, or TXT)
 4. **Choose output format** (PDF or DOCX)
-5. **Submit** — the backend scrapes the job description, parses your resume, sends both to the selected LLM with tailored prompts, and generates two documents
-6. **Download** your tailored resume and comprehensive CV
+5. **Submit** — the backend scrapes the job description, parses your resume, sends both to the selected LLM with tailored prompts, and generates three documents
+6. **Download** your tailored resume, comprehensive CV, and personalized cover letter
 
 ## Contributing
 

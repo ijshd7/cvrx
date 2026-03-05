@@ -65,7 +65,7 @@ export default function Home() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight">CVRX</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            AI-powered Resume &amp; CV Generator
+            AI-powered Resume, CV &amp; Cover Letter Generator
           </p>
         </div>
 
@@ -75,7 +75,7 @@ export default function Home() {
               <CardTitle>Generate Tailored Documents</CardTitle>
               <CardDescription>
                 Select a model, provide the job listing, upload your resume, and
-                get an optimized resume and CV.
+                get an optimized resume, CV, and cover letter.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -104,7 +104,7 @@ export default function Home() {
                     Generating...
                   </>
                 ) : (
-                  "Generate Resume & CV"
+                  "Generate Documents"
                 )}
               </Button>
 

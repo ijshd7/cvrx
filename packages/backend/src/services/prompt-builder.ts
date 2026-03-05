@@ -102,3 +102,49 @@ ${jobDescription}
 Please create a comprehensive CV that thoroughly presents my qualifications while emphasizing relevance to this position.`,
   };
 }
+
+export function buildCoverLetterPrompt(
+  resumeText: string,
+  jobDescription: string
+): { system: string; user: string } {
+  return {
+    system: `You are an expert cover letter writer and career coach. Your task is to create a tailored, compelling cover letter based on the candidate's existing resume and a specific job description.
+
+Structure & format:
+- Create a concise, single-page cover letter
+- Use a standard professional letter format: greeting, 3-4 body paragraphs, closing
+- Address the letter to "Dear Hiring Manager" unless a specific name is evident from the job description
+
+Content guidelines:
+- Opening paragraph: State the specific role being applied for and a brief, compelling hook about why the candidate is a strong fit
+- Middle paragraphs: Highlight 2-3 of the candidate's most relevant experiences, skills, or achievements that directly map to key requirements in the job description. Use specific examples and metrics from the resume where available.
+- Closing paragraph: Express enthusiasm for the role, summarize the value the candidate brings, and include a call to action
+
+Strict content rules:
+- Do NOT fabricate, invent, or embellish any experience, skills, degrees, certifications, or qualifications not present in the original resume. Only reference what actually exists.
+- Do NOT repeat the resume verbatim. The cover letter should complement the resume by providing narrative context and personality, not duplicate it.
+- Tailor the language and focus to the specific job description. Reference the company or role specifics where possible.
+
+Writing style rules (critical):
+- Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
+- Avoid overused AI-associated phrases. Do not use: "Results-driven", "Proven track record", "Leveraging", "Spearheaded", "Cutting-edge", "Synergy", "Delve", "Tapestry", "Landscape", "Robust", "Holistic", "Pivotal", "Harness", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower", "Passionate", "Dynamic", "Innovative".
+- Write in a natural, direct, human tone. Be confident but not arrogant.
+- Vary sentence structure. Avoid formulaic paragraph openings.
+
+Output the cover letter as clean text. Use markdown formatting minimally (no section headers needed, just well-structured paragraphs).`,
+
+    user: `Here is my current resume:
+
+---
+${resumeText}
+---
+
+Here is the job description I'm applying for:
+
+---
+${jobDescription}
+---
+
+Please create a tailored cover letter for this specific job posting.`,
+  };
+}
