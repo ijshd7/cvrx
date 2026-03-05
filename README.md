@@ -4,11 +4,9 @@ AI-powered resume and CV generator. Provide a job listing and your existing resu
 
 ## Demo
 
-![CVRX Demo](docs/cvrxDemo.gif)
+![CVRX Demo](docs/cvrxDemo1.gif)
 
-### Generated Output
-
-![CVRX Screenshot](docs/cvrxScreenshot.png)
+![CVRX Demo](docs/cvrxDemo2.gif)
 
 ## Features
 

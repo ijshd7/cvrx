@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import type { OutputFormat } from "@cvrx/shared";
+import type { OutputFormat, GenerateProgressEvent, GenerateResponse } from "@cvrx/shared";
 import { upload } from "../middleware/upload";
 import { scrapeJobListing } from "../services/scraper";
 import { parseResume } from "../services/file-parser";
@@ -18,6 +18,10 @@ const generateSchema = z.object({
   jobDescription: z.string().optional().or(z.literal("")),
   outputFormat: z.enum(["pdf", "docx"]),
 });
+
+function sendSSE(res: Response, event: GenerateProgressEvent) {
+  res.write(`data: ${JSON.stringify(event)}\n\n`);
+}
 
 router.post(
   "/generate",
@@ -40,11 +44,18 @@ router.post(
         return;
       }
 
+      // Set up SSE headers
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.flushHeaders();
+
       // Get job description: try URL first, fall back to manual text
       let finalJobDescription = "";
       let scrapeError = "";
 
       if (jobUrl) {
+        sendSSE(res, { step: "scraping", progress: 5, message: "Scraping job listing..." });
         try {
           finalJobDescription = await scrapeJobListing(jobUrl);
         } catch (err) {
@@ -61,23 +72,31 @@ router.post(
         const message = scrapeError
           ? `Could not extract a job description from the URL: ${scrapeError}`
           : "Could not obtain job description. Please provide a URL or paste the description manually.";
-        res.status(400).json({ error: message });
+        sendSSE(res, { step: "scraping", progress: 0, message });
+        res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
+        res.end();
         return;
       }
 
       // Parse resume
+      sendSSE(res, { step: "parsing", progress: 15, message: "Parsing resume..." });
       const resumeText = await parseResume(req.file.buffer, req.file.mimetype);
 
       // Generate resume and CV in parallel
+      sendSSE(res, { step: "generating_resume", progress: 25, message: "Generating tailored resume..." });
       const resumePrompt = buildResumePrompt(resumeText, finalJobDescription);
       const cvPrompt = buildCvPrompt(resumeText, finalJobDescription);
 
       const [resumeContent, cvContent] = await Promise.all([
-        generateContent(model, resumePrompt.system, resumePrompt.user),
+        generateContent(model, resumePrompt.system, resumePrompt.user).then((result) => {
+          sendSSE(res, { step: "generating_cv", progress: 50, message: "Generating cover letter..." });
+          return result;
+        }),
         generateContent(model, cvPrompt.system, cvPrompt.user),
       ]);
 
       // Generate documents
+      sendSSE(res, { step: "building_documents", progress: 75, message: "Building documents..." });
       const format = outputFormat as OutputFormat;
       const [resumeDoc, cvDoc] = await Promise.all([
         generateDocument(resumeContent, format, "Resume"),
@@ -94,12 +113,16 @@ router.post(
       writeTempFile(resumePath, resumeDoc);
       writeTempFile(cvPath, cvDoc);
 
-      res.json({
+      const data: GenerateResponse = {
         jobId,
         resumeDownloadUrl: `/api/download/${jobId}/resume`,
         cvDownloadUrl: `/api/download/${jobId}/cv`,
         outputFormat: format,
-      });
+      };
+
+      sendSSE(res, { step: "complete", progress: 100, message: "Done!" });
+      res.write(`data: ${JSON.stringify({ done: true, data })}\n\n`);
+      res.end();
     } catch (err: unknown) {
       const error = err as Error & { status?: number; code?: string };
       console.error("[Generate]", {
@@ -109,14 +132,19 @@ router.post(
         stack: error.stack,
       });
 
-      const status = error.status && error.status >= 400 && error.status < 600
-        ? error.status
-        : 500;
-
-      res.status(status).json({
-        error: "Failed to generate documents.",
-        details: error.message,
-      });
+      // If headers already sent (SSE mode), send error as event
+      if (res.headersSent) {
+        res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+        res.end();
+      } else {
+        const status = error.status && error.status >= 400 && error.status < 600
+          ? error.status
+          : 500;
+        res.status(status).json({
+          error: "Failed to generate documents.",
+          details: error.message,
+        });
+      }
     }
   }
 );

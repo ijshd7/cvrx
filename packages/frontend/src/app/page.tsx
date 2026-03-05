@@ -16,6 +16,7 @@ import { OutputFormatSelector } from "@/components/output-format-selector";
 import { DownloadCard } from "@/components/download-card";
 import { useGeneration } from "@/hooks/use-generation";
 import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
 import type { OutputFormat } from "@cvrx/shared";
 
@@ -26,7 +27,7 @@ export default function Home() {
   const [resume, setResume] = useState<File | null>(null);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>("pdf");
 
-  const { loading, error, result, generate, reset } = useGeneration();
+  const { loading, error, result, progress, stepMessage, generate, reset } = useGeneration();
 
   const canSubmit =
     model && (jobUrl || jobDescription) && resume && !loading;
@@ -106,6 +107,15 @@ export default function Home() {
                   "Generate Resume & CV"
                 )}
               </Button>
+
+              {loading && (
+                <div className="space-y-2">
+                  <Progress value={progress} />
+                  <p className="text-sm text-muted-foreground text-center">
+                    {stepMessage}
+                  </p>
+                </div>
+              )}
 
               {error && (
                 <p className="text-sm text-destructive text-center">{error}</p>

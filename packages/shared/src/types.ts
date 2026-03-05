@@ -22,3 +22,24 @@ export interface ApiError {
   error: string;
   details?: string;
 }
+
+export type GenerateStep =
+  | "scraping"
+  | "parsing"
+  | "generating_resume"
+  | "generating_cv"
+  | "building_documents"
+  | "complete";
+
+export interface GenerateProgressEvent {
+  step: GenerateStep;
+  progress: number;
+  message: string;
+}
+
+export interface GenerateCompleteEvent extends GenerateProgressEvent {
+  step: "complete";
+  data: GenerateResponse;
+}
+
+export type GenerateSSEEvent = GenerateProgressEvent | GenerateCompleteEvent;
