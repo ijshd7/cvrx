@@ -23,11 +23,12 @@ AI-powered resume and CV generator. Provide a job listing and your existing resu
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 15, React 19, TailwindCSS 4, Shadcn UI |
+| Frontend | Next.js 16, React 19, TailwindCSS 4, Shadcn UI |
 | Backend | Express.js 5, TypeScript |
 | AI | OpenRouter API (OpenAI-compatible) |
-| Document Generation | docx (Word), PDFKit (PDF) |
+| Document Generation | docx (Word), PDFKit (PDF), mammoth & pdf-parse (parsing) |
 | Scraping | Cheerio (static HTML parsing) |
+| Validation | Zod |
 | Containerization | Docker, Docker Compose |
 | Package Manager | pnpm workspaces |
 
@@ -139,7 +140,7 @@ cvrx/
 |--------|------|-------------|
 | `GET` | `/api/models` | List available OpenRouter models |
 | `POST` | `/api/generate` | Generate resume and CV (multipart form) |
-| `GET` | `/api/download/:jobId/:docType` | Download generated document |
+| `GET` | `/api/download/:jobId/:docType?format=pdf\|docx` | Download generated document |
 | `GET` | `/api/health` | Health check |
 
 ## How It Works
