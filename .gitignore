@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.next/
+.env
+*.tsbuildinfo
+.turbo/
+tmp/
+/packages/backend/uploads/
+*.log
+.DS_Store

@@ -1,0 +1,22 @@
+{
+  "name": "cvrx",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm --filter @cvrx/shared build && pnpm --filter @cvrx/frontend build && pnpm --filter @cvrx/backend build",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint -- --fix",
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier --write \"packages/*/src/**/*.{ts,tsx}\"",
+    "clean": "rm -rf packages/*/dist packages/*/.next packages/*/node_modules node_modules"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "prettier": "^3.4.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
