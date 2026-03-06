@@ -20,7 +20,7 @@ export async function generateDocument(
   return generatePdf(content, title);
 }
 
-function parseMarkdownContent(
+export function parseMarkdownContent(
   content: string
 ): Array<{ type: "heading" | "bullet" | "text"; text: string; level?: number }> {
   const lines = content.split("\n");
@@ -50,11 +50,11 @@ function parseMarkdownContent(
   return parsed;
 }
 
-function stripMarkdownFormatting(text: string): string {
+export function stripMarkdownFormatting(text: string): string {
   return text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/\*(.*?)\*/g, "$1");
 }
 
-function createTextRuns(text: string): TextRun[] {
+export function createTextRuns(text: string): TextRun[] {
   const runs: TextRun[] = [];
   const parts = text.split(/(\*\*.*?\*\*)/g);
 
