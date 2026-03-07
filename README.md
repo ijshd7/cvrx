@@ -41,7 +41,7 @@ AI-powered resume, CV, and cover letter generator. Provide a job listing and you
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/cvrx.git
+git clone https://github.com/ijshd7/cvrx.git
 cd cvrx
 
 # Use correct Node version (if using nvm)
