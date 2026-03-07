@@ -69,7 +69,7 @@ describe("DownloadCard Component", () => {
 
   it("sets correct href for CV download link", () => {
     render(<DownloadCard result={mockResult} />);
-    const cvLink = screen.getByRole("link", { name: /CV/ });
+    const cvLink = screen.getByRole("link", { name: /Curriculum Vitae/ });
     expect(cvLink).toHaveAttribute("href", expect.stringContaining("cv"));
     expect(cvLink).toHaveAttribute("download");
   });
@@ -88,7 +88,7 @@ describe("DownloadCard Component", () => {
     render(<DownloadCard result={mockResult} />);
     const links = screen.getAllByRole("link");
     links.forEach((link) => {
-      expect(link).toHaveClass("flex-1");
+      expect(link).toHaveClass("block");
     });
   });
 
