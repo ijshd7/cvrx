@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { submitGeneration } from "@/lib/api";
-import type { GenerateResponse, GenerateProgressEvent, GenerateStep, OutputFormat } from "@cvrx/shared";
+import type {
+  GenerateResponse,
+  GenerateProgressEvent,
+  GenerateStep,
+  OutputFormat,
+} from "@cvrx/shared";
 
 interface GenerationState {
   loading: boolean;
@@ -30,7 +35,14 @@ export function useGeneration() {
     resume: File;
     outputFormat: OutputFormat;
   }) => {
-    setState({ loading: true, error: null, result: null, progress: 0, step: null, stepMessage: "" });
+    setState({
+      loading: true,
+      error: null,
+      result: null,
+      progress: 0,
+      step: null,
+      stepMessage: "",
+    });
 
     const formData = new FormData();
     formData.append("model", params.model);
@@ -77,7 +89,14 @@ export function useGeneration() {
   };
 
   const reset = () => {
-    setState({ loading: false, error: null, result: null, progress: 0, step: null, stepMessage: "" });
+    setState({
+      loading: false,
+      error: null,
+      result: null,
+      progress: 0,
+      step: null,
+      stepMessage: "",
+    });
   };
 
   return { ...state, generate, reset };

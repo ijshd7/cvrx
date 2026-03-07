@@ -12,7 +12,7 @@ import type { OutputFormat } from "@cvrx/shared";
 export async function generateDocument(
   content: string,
   format: OutputFormat,
-  title: string
+  title: string,
 ): Promise<Buffer> {
   if (format === "docx") {
     return generateDocx(content, title);
@@ -21,8 +21,12 @@ export async function generateDocument(
 }
 
 export function parseMarkdownContent(
-  content: string
-): Array<{ type: "heading" | "bullet" | "text"; text: string; level?: number }> {
+  content: string,
+): Array<{
+  type: "heading" | "bullet" | "text";
+  text: string;
+  level?: number;
+}> {
   const lines = content.split("\n");
   const parsed: Array<{
     type: "heading" | "bullet" | "text";
@@ -35,11 +39,23 @@ export function parseMarkdownContent(
     if (!trimmed) continue;
 
     if (trimmed.startsWith("## ")) {
-      parsed.push({ type: "heading", text: trimmed.replace(/^##\s+/, ""), level: 2 });
+      parsed.push({
+        type: "heading",
+        text: trimmed.replace(/^##\s+/, ""),
+        level: 2,
+      });
     } else if (trimmed.startsWith("### ")) {
-      parsed.push({ type: "heading", text: trimmed.replace(/^###\s+/, ""), level: 3 });
+      parsed.push({
+        type: "heading",
+        text: trimmed.replace(/^###\s+/, ""),
+        level: 3,
+      });
     } else if (trimmed.startsWith("# ")) {
-      parsed.push({ type: "heading", text: trimmed.replace(/^#\s+/, ""), level: 1 });
+      parsed.push({
+        type: "heading",
+        text: trimmed.replace(/^#\s+/, ""),
+        level: 1,
+      });
     } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       parsed.push({ type: "bullet", text: trimmed.replace(/^[-*]\s+/, "") });
     } else {
@@ -79,7 +95,7 @@ async function generateDocx(content: string, title: string): Promise<Buffer> {
       children: [new TextRun({ text: title, bold: true, size: 32 })],
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
-    })
+    }),
   );
 
   for (const item of parsed) {
@@ -96,7 +112,7 @@ async function generateDocx(content: string, title: string): Promise<Buffer> {
           text: stripMarkdownFormatting(item.text),
           heading: level,
           spacing: { before: 240, after: 120 },
-        })
+        }),
       );
     } else if (item.type === "bullet") {
       children.push(
@@ -104,14 +120,14 @@ async function generateDocx(content: string, title: string): Promise<Buffer> {
           children: createTextRuns(item.text),
           bullet: { level: 0 },
           spacing: { after: 60 },
-        })
+        }),
       );
     } else {
       children.push(
         new Paragraph({
           children: createTextRuns(item.text),
           spacing: { after: 120 },
-        })
+        }),
       );
     }
   }

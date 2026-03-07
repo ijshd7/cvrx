@@ -1,107 +1,72 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { OutputFormatSelector } from '@/components/output-format-selector'
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { OutputFormatSelector } from "@/components/output-format-selector";
 
-describe('OutputFormatSelector Component', () => {
-  it('renders PDF and DOCX options', () => {
-    const handleChange = vi.fn()
-    render(
-      <OutputFormatSelector
-        value="pdf"
-        onChange={handleChange}
-      />
-    )
+describe("OutputFormatSelector Component", () => {
+  it("renders PDF and Word Document options", () => {
+    const handleChange = vi.fn();
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
 
-    expect(screen.getByText('PDF')).toBeInTheDocument()
-    expect(screen.getByText('DOCX (Word)')).toBeInTheDocument()
-  })
+    expect(screen.getByText("PDF")).toBeInTheDocument();
+    expect(screen.getByText("Word Document")).toBeInTheDocument();
+  });
 
-  it('displays output format label', () => {
-    const handleChange = vi.fn()
-    render(
-      <OutputFormatSelector
-        value="pdf"
-        onChange={handleChange}
-      />
-    )
+  it("displays output format heading", () => {
+    const handleChange = vi.fn();
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
 
-    expect(screen.getByText('Output Format')).toBeInTheDocument()
-  })
+    expect(screen.getByText("Output Format")).toBeInTheDocument();
+  });
 
-  it('marks the correct radio button as checked based on value prop', () => {
-    const handleChange = vi.fn()
+  it("highlights the selected format button with primary color", () => {
+    const handleChange = vi.fn();
     const { rerender } = render(
-      <OutputFormatSelector
-        value="pdf"
-        onChange={handleChange}
-      />
-    )
+      <OutputFormatSelector value="pdf" onChange={handleChange} />,
+    );
 
-    const pdfRadio = screen.getByRole('radio', { name: 'PDF' })
-    const docxRadio = screen.getByRole('radio', { name: 'DOCX (Word)' })
+    const pdfButton = screen.getByRole("button", { name: /PDF/ });
+    const docxButton = screen.getByRole("button", { name: /Word Document/ });
 
-    expect(pdfRadio).toHaveAttribute('data-state', 'checked')
-    expect(docxRadio).not.toHaveAttribute('data-state', 'checked')
+    expect(pdfButton).toHaveClass("border-primary");
+    expect(docxButton).not.toHaveClass("border-primary");
 
     // Rerender with docx value
-    rerender(
-      <OutputFormatSelector
-        value="docx"
-        onChange={handleChange}
-      />
-    )
+    rerender(<OutputFormatSelector value="docx" onChange={handleChange} />);
 
-    expect(pdfRadio).not.toHaveAttribute('data-state', 'checked')
-    expect(docxRadio).toHaveAttribute('data-state', 'checked')
-  })
+    expect(pdfButton).not.toHaveClass("border-primary");
+    expect(docxButton).toHaveClass("border-primary");
+  });
 
-  it('calls onChange when a different format is selected', async () => {
-    const user = userEvent.setup()
-    const handleChange = vi.fn()
+  it("calls onChange when a different format is selected", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
 
-    render(
-      <OutputFormatSelector
-        value="pdf"
-        onChange={handleChange}
-      />
-    )
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
 
-    const docxLabel = screen.getByText('DOCX (Word)')
-    await user.click(docxLabel)
+    const docxButton = screen.getByRole("button", { name: /Word Document/ });
+    await user.click(docxButton);
 
-    expect(handleChange).toHaveBeenCalledWith('docx')
-  })
+    expect(handleChange).toHaveBeenCalledWith("docx");
+  });
 
-  it('does not call onChange when selecting the already-selected format', async () => {
-    const user = userEvent.setup()
-    const handleChange = vi.fn()
+  it("calls onChange when selecting the already-selected format", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
 
-    render(
-      <OutputFormatSelector
-        value="pdf"
-        onChange={handleChange}
-      />
-    )
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
 
-    const pdfLabel = screen.getByText('PDF')
-    await user.click(pdfLabel)
+    const pdfButton = screen.getByRole("button", { name: /PDF/ });
+    await user.click(pdfButton);
 
-    // May or may not be called depending on RadioGroup behavior
-    // Just verify it doesn't error
-    expect(handleChange).toBeDefined()
-  })
+    expect(handleChange).toHaveBeenCalledWith("pdf");
+  });
 
-  it('renders with proper styling classes', () => {
-    const handleChange = vi.fn()
-    const { container } = render(
-      <OutputFormatSelector
-        value="pdf"
-        onChange={handleChange}
-      />
-    )
+  it("renders format buttons with proper styling", () => {
+    const handleChange = vi.fn();
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
 
-    const radioGroup = container.querySelector('[role="radiogroup"]')
-    expect(radioGroup).toHaveClass('flex', 'gap-4')
-  })
-})
+    const pdfButton = screen.getByRole("button", { name: /PDF/ });
+    expect(pdfButton).toHaveClass("rounded-xl", "border-2");
+  });
+});

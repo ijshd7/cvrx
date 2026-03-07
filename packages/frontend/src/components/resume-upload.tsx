@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Label } from "@/components/ui/label";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, FileUp } from "lucide-react";
 
 const ACCEPTED_TYPES = [
   "application/pdf",
@@ -24,11 +24,14 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
 
   const handleFile = useCallback(
     (f: File) => {
-      if (ACCEPTED_TYPES.includes(f.type) || f.name.match(/\.(pdf|docx|txt)$/i)) {
+      if (
+        ACCEPTED_TYPES.includes(f.type) ||
+        f.name.match(/\.(pdf|docx|txt)$/i)
+      ) {
         onFileChange(f);
       }
     },
-    [onFileChange]
+    [onFileChange],
   );
 
   const handleDrop = useCallback(
@@ -38,19 +41,23 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
       const f = e.dataTransfer.files[0];
       if (f) handleFile(f);
     },
-    [handleFile]
+    [handleFile],
   );
 
   return (
-    <div className="space-y-2">
-      <Label>Resume Upload</Label>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4">
+        <FileUp className="w-5 h-5 text-primary" />
+        <h2 className="font-semibold text-lg">Upload Resume</h2>
+      </div>
+
       <div
         className={cn(
-          "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
+          "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all",
           dragOver
-            ? "border-primary bg-primary/5"
-            : "border-muted-foreground/25 hover:border-muted-foreground/50",
-          file && "border-primary/50 bg-primary/5"
+            ? "border-primary bg-primary/5 shadow-[0_0_20px_oklch(0.62_0.21_264/0.2)]"
+            : "border-border/40 hover:border-primary/50 bg-card",
+          file && "border-primary/60 bg-primary/5",
         )}
         onDragOver={(e) => {
           e.preventDefault();
@@ -71,33 +78,59 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
           }}
         />
 
-        {file ? (
-          <div className="flex items-center justify-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">{file.name}</span>
-            <button
-              type="button"
-              className="ml-2 text-muted-foreground hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                onFileChange(null);
-                if (inputRef.current) inputRef.current.value = "";
-              }}
+        <AnimatePresence mode="wait">
+          {file ? (
+            <motion.div
+              key="file"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex items-center justify-center gap-3"
             >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Drag and drop your resume, or click to browse
-            </p>
-            <p className="text-xs text-muted-foreground">
-              PDF, DOCX, or TXT (max 10MB)
-            </p>
-          </div>
-        )}
+              <FileText className="h-6 w-6 text-primary" />
+              <span className="text-sm font-medium text-foreground">
+                {file.name}
+              </span>
+              <button
+                type="button"
+                className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFileChange(null);
+                  if (inputRef.current) inputRef.current.value = "";
+                }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="space-y-3"
+            >
+              <motion.div
+                animate={{ scale: dragOver ? 1.1 : 1, y: dragOver ? -4 : 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
+                <Upload className="h-10 w-10 mx-auto text-muted-foreground" />
+              </motion.div>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Drag and drop your resume
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  or click to browse
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground/50">
+                PDF, DOCX, or TXT (max 10MB)
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

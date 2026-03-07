@@ -1,14 +1,26 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import type { OutputFormat, GenerateProgressEvent, GenerateResponse } from "@cvrx/shared";
+import type {
+  OutputFormat,
+  GenerateProgressEvent,
+  GenerateResponse,
+} from "@cvrx/shared";
 import { upload } from "../middleware/upload";
 import { scrapeJobListing } from "../services/scraper";
 import { parseResume } from "../services/file-parser";
 import { generateContent } from "../services/openrouter";
-import { buildResumePrompt, buildCvPrompt, buildCoverLetterPrompt } from "../services/prompt-builder";
+import {
+  buildResumePrompt,
+  buildCvPrompt,
+  buildCoverLetterPrompt,
+} from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
-import { ensureTempDir, getTempFilePath, writeTempFile } from "../utils/temp-files";
+import {
+  ensureTempDir,
+  getTempFilePath,
+  writeTempFile,
+} from "../utils/temp-files";
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -55,7 +67,11 @@ router.post(
       let scrapeError = "";
 
       if (jobUrl) {
-        sendSSE(res, { step: "scraping", progress: 5, message: "Scraping job listing..." });
+        sendSSE(res, {
+          step: "scraping",
+          progress: 5,
+          message: "Scraping job listing...",
+        });
         try {
           finalJobDescription = await scrapeJobListing(jobUrl);
         } catch (err) {
@@ -79,29 +95,60 @@ router.post(
       }
 
       // Parse resume
-      sendSSE(res, { step: "parsing", progress: 15, message: "Parsing resume..." });
+      sendSSE(res, {
+        step: "parsing",
+        progress: 15,
+        message: "Parsing resume...",
+      });
       const resumeText = await parseResume(req.file.buffer, req.file.mimetype);
 
       // Generate resume, CV, and cover letter in parallel
-      sendSSE(res, { step: "generating_resume", progress: 20, message: "Generating tailored resume..." });
+      sendSSE(res, {
+        step: "generating_resume",
+        progress: 20,
+        message: "Generating tailored resume...",
+      });
       const resumePrompt = buildResumePrompt(resumeText, finalJobDescription);
       const cvPrompt = buildCvPrompt(resumeText, finalJobDescription);
-      const coverLetterPrompt = buildCoverLetterPrompt(resumeText, finalJobDescription);
+      const coverLetterPrompt = buildCoverLetterPrompt(
+        resumeText,
+        finalJobDescription,
+      );
 
       const [resumeContent, cvContent, coverLetterContent] = await Promise.all([
-        generateContent(model, resumePrompt.system, resumePrompt.user).then((result) => {
-          sendSSE(res, { step: "generating_cv", progress: 35, message: "Generating CV..." });
-          return result;
-        }),
-        generateContent(model, cvPrompt.system, cvPrompt.user).then((result) => {
-          sendSSE(res, { step: "generating_cover_letter", progress: 50, message: "Generating cover letter..." });
-          return result;
-        }),
-        generateContent(model, coverLetterPrompt.system, coverLetterPrompt.user),
+        generateContent(model, resumePrompt.system, resumePrompt.user).then(
+          (result) => {
+            sendSSE(res, {
+              step: "generating_cv",
+              progress: 35,
+              message: "Generating CV...",
+            });
+            return result;
+          },
+        ),
+        generateContent(model, cvPrompt.system, cvPrompt.user).then(
+          (result) => {
+            sendSSE(res, {
+              step: "generating_cover_letter",
+              progress: 50,
+              message: "Generating cover letter...",
+            });
+            return result;
+          },
+        ),
+        generateContent(
+          model,
+          coverLetterPrompt.system,
+          coverLetterPrompt.user,
+        ),
       ]);
 
       // Generate documents
-      sendSSE(res, { step: "building_documents", progress: 70, message: "Building documents..." });
+      sendSSE(res, {
+        step: "building_documents",
+        progress: 70,
+        message: "Building documents...",
+      });
       const format = outputFormat as OutputFormat;
       const [resumeDoc, cvDoc, coverLetterDoc] = await Promise.all([
         generateDocument(resumeContent, format, "Resume"),
@@ -146,16 +193,17 @@ router.post(
         res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
         res.end();
       } else {
-        const status = error.status && error.status >= 400 && error.status < 600
-          ? error.status
-          : 500;
+        const status =
+          error.status && error.status >= 400 && error.status < 600
+            ? error.status
+            : 500;
         res.status(status).json({
           error: "Failed to generate documents.",
           details: error.message,
         });
       }
     }
-  }
+  },
 );
 
 export default router;

@@ -11,7 +11,7 @@ export function ensureTempDir(jobId: string): string {
 export function getTempFilePath(
   jobId: string,
   docType: string,
-  format: string
+  format: string,
 ): string {
   return path.join(config.TEMP_DIR, jobId, `${docType}.${format}`);
 }
@@ -34,9 +34,7 @@ export function startCleanupScheduler(): void {
     cleanupOldFiles();
   }, interval);
 
-  console.log(
-    `[Cleanup] Scheduler started. TTL: ${config.TEMP_FILE_TTL_MS}ms`
-  );
+  console.log(`[Cleanup] Scheduler started. TTL: ${config.TEMP_FILE_TTL_MS}ms`);
 }
 
 function cleanupOldFiles(): void {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Brain } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -8,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { fetchModels } from "@/lib/api";
 import type { ModelInfo } from "@cvrx/shared";
 
@@ -35,10 +35,16 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
   }, []);
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="model">Language Model</Label>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4">
+        <Brain className="w-5 h-5 text-primary" />
+        <h2 className="font-semibold text-lg">Select AI Model</h2>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        Choose the AI model that will generate your documents.
+      </p>
       <Select value={value} onValueChange={onChange} disabled={loading}>
-        <SelectTrigger id="model" className="w-full">
+        <SelectTrigger id="model" className="w-full bg-input border-border">
           <SelectValue
             placeholder={
               loading
@@ -57,9 +63,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
           ))}
         </SelectContent>
       </Select>
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

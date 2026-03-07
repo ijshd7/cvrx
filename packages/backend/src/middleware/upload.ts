@@ -17,8 +17,8 @@ export const upload = multer({
     } else {
       cb(
         new Error(
-          "Invalid file type. Only PDF, DOCX, and TXT files are accepted."
-        )
+          "Invalid file type. Only PDF, DOCX, and TXT files are accepted.",
+        ),
       );
     }
   },

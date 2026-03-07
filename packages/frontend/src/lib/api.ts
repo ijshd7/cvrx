@@ -1,4 +1,8 @@
-import type { ModelsResponse, GenerateResponse, GenerateProgressEvent } from "@cvrx/shared";
+import type {
+  ModelsResponse,
+  GenerateResponse,
+  GenerateProgressEvent,
+} from "@cvrx/shared";
 
 const API_BASE = "/api";
 // SSE streams can't go through Next.js rewrite proxy (it buffers the full response).
@@ -24,7 +28,7 @@ export interface SSECallbacks {
 
 export async function submitGeneration(
   formData: FormData,
-  callbacks: SSECallbacks
+  callbacks: SSECallbacks,
 ): Promise<void> {
   const res = await fetch(`${STREAM_API_BASE}/generate`, {
     method: "POST",

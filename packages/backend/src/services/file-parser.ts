@@ -3,7 +3,7 @@ import mammoth from "mammoth";
 
 export async function parseResume(
   buffer: Buffer,
-  mimetype: string
+  mimetype: string,
 ): Promise<string> {
   switch (mimetype) {
     case "application/pdf":
@@ -22,7 +22,7 @@ async function parsePdf(buffer: Buffer): Promise<string> {
   const text = data.text.trim();
   if (!text) {
     throw new Error(
-      "Could not extract text from PDF. The file may be image-based. Please upload a text-based PDF or paste your resume as a .txt file."
+      "Could not extract text from PDF. The file may be image-based. Please upload a text-based PDF or paste your resume as a .txt file.",
     );
   }
   return text;

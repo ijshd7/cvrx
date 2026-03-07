@@ -1,6 +1,6 @@
 export function buildResumePrompt(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
 ): { system: string; user: string } {
   return {
     system: `You are an expert resume writer and career coach. Your task is to create a tailored, ATS-optimized resume based on the candidate's existing resume and a specific job description.
@@ -52,7 +52,7 @@ Please create a tailored resume optimized for this specific job posting.`,
 
 export function buildCvPrompt(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
 ): { system: string; user: string } {
   return {
     system: `You are an expert CV writer and career consultant. Your task is to create a comprehensive Curriculum Vitae (CV) based on the candidate's existing resume and a specific job description.
@@ -105,7 +105,7 @@ Please create a comprehensive CV that thoroughly presents my qualifications whil
 
 export function buildCoverLetterPrompt(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
 ): { system: string; user: string } {
   return {
     system: `You are an expert cover letter writer and career coach. Your task is to create a tailored, compelling cover letter based on the candidate's existing resume and a specific job description.

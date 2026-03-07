@@ -58,7 +58,7 @@ export async function fetchModels(): Promise<ModelInfo[]> {
 export async function generateContent(
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
 ): Promise<string> {
   const completion = await client.chat.completions.create({
     model,

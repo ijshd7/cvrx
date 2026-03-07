@@ -45,7 +45,9 @@ export async function scrapeJobListing(url: string): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to fetch URL: ${response.status} ${response.statusText}`,
+    );
   }
 
   const html = await response.text();
@@ -53,7 +55,7 @@ export async function scrapeJobListing(url: string): Promise<string> {
 
   // Remove non-content elements
   $(
-    "script, style, nav, header, footer, iframe, noscript, aside, .sidebar, .nav, .menu, .cookie-banner, form"
+    "script, style, nav, header, footer, iframe, noscript, aside, .sidebar, .nav, .menu, .cookie-banner, form",
   ).remove();
 
   // Try common job description selectors first
@@ -85,19 +87,19 @@ export async function scrapeJobListing(url: string): Promise<string> {
 
   if (bodyText.length < MIN_CONTENT_LENGTH) {
     throw new Error(
-      "Could not extract meaningful content from the URL. The page may require login. Please paste the job description manually."
+      "Could not extract meaningful content from the URL. The page may require login. Please paste the job description manually.",
     );
   }
 
   if (looksLikeAuthPage(bodyText)) {
     throw new Error(
-      "The URL appears to be a login or authentication page. Please paste the job description manually."
+      "The URL appears to be a login or authentication page. Please paste the job description manually.",
     );
   }
 
   if (!looksLikeJobDescription(bodyText)) {
     throw new Error(
-      "The URL does not appear to contain a job description. The page may require login or use JavaScript to load content. Please paste the job description manually."
+      "The URL does not appear to contain a job description. The page may require login or use JavaScript to load content. Please paste the job description manually.",
     );
   }
 

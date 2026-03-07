@@ -4,7 +4,7 @@ export function errorHandler(
   err: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ) {
   console.error("[Error]", err.message);
 
@@ -20,7 +20,6 @@ export function errorHandler(
 
   res.status(500).json({
     error: "Internal server error",
-    details:
-      process.env.NODE_ENV === "development" ? err.message : undefined,
+    details: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 }
