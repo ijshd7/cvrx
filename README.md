@@ -1,5 +1,7 @@
 # CVRX
 
+[![CI](https://github.com/ijshd7/cvrx/actions/workflows/ci.yml/badge.svg)](https://github.com/ijshd7/cvrx/actions/workflows/ci.yml)
+
 AI-powered resume, CV, and cover letter generator. Provide a job listing and your existing resume, select a language model via [OpenRouter](https://openrouter.ai), and receive a tailored resume, comprehensive CV, and personalized cover letter ready to download.
 
 ## Demo
