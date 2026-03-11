@@ -214,9 +214,10 @@ describe("DownloadCard Component", () => {
     await user.click(firstPreviewButton);
 
     // Preview dialog should be rendered with resume as initial doc type
-    expect(
-      screen.getByTestId("preview-dialog-resume"),
-    ).toHaveAttribute("data-open", "true");
+    expect(screen.getByTestId("preview-dialog-resume")).toHaveAttribute(
+      "data-open",
+      "true",
+    );
   });
 
   it("renders DocumentPreview component", () => {

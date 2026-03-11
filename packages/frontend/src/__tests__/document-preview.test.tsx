@@ -62,7 +62,9 @@ describe("DocumentPreview Component", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Preview Resume before downloading/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Preview Resume before downloading/),
+      ).toBeInTheDocument();
     });
   });
 
@@ -81,8 +83,12 @@ describe("DocumentPreview Component", () => {
     await waitFor(() => {
       expect(screen.getByRole("tab", { name: /Resume/ })).toBeInTheDocument();
       expect(screen.getByRole("tab", { name: /CV/ })).toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: /Cover Letter/ })).toBeInTheDocument();
-      expect(screen.getByRole("tab", { name: /Why This Company/ })).toBeInTheDocument();
+      expect(
+        screen.getByRole("tab", { name: /Cover Letter/ }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("tab", { name: /Why This Company/ }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -135,9 +141,7 @@ describe("DocumentPreview Component", () => {
   it("displays loading state while fetching", async () => {
     mockFetchPreview.mockImplementation(
       () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve(mockContent), 100),
-        ),
+        new Promise((resolve) => setTimeout(() => resolve(mockContent), 100)),
     );
 
     render(
@@ -234,14 +238,18 @@ describe("DocumentPreview Component", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Preview Resume before downloading/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Preview Resume before downloading/),
+      ).toBeInTheDocument();
     });
 
     const cvTab = screen.getByRole("tab", { name: /CV/ });
     await userEvent.click(cvTab);
 
     await waitFor(() => {
-      expect(screen.getByText(/Preview Curriculum Vitae before downloading/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Preview Curriculum Vitae before downloading/),
+      ).toBeInTheDocument();
     });
   });
 });

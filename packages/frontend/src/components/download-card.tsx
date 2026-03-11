@@ -10,7 +10,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, BookOpen, Mail, MessageSquareText, Archive, CheckCircle2, Eye } from "lucide-react";
+import {
+  Download,
+  FileText,
+  BookOpen,
+  Mail,
+  MessageSquareText,
+  Archive,
+  CheckCircle2,
+  Eye,
+} from "lucide-react";
 import type { GenerateResponse, DocType } from "@cvrx/shared";
 import { getDownloadUrl, getAllDownloadUrl } from "@/lib/api";
 import { AtsScoreCard } from "./ats-score-card";

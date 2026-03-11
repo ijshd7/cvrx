@@ -111,9 +111,7 @@ export function DocumentPreview({
                   animate={{ opacity: 1 }}
                   className="prose dark:prose-invert prose-sm max-w-none p-4 bg-muted/30 rounded-lg overflow-y-auto"
                 >
-                  <ReactMarkdown>
-                    {content}
-                  </ReactMarkdown>
+                  <ReactMarkdown>{content}</ReactMarkdown>
                 </motion.div>
               )}
             </TabsContent>

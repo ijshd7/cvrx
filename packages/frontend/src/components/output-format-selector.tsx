@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, FileSpreadsheet, FileOutput, FileType, Code } from "lucide-react";
+import {
+  FileText,
+  FileSpreadsheet,
+  FileOutput,
+  FileType,
+  Code,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { OutputFormat } from "@cvrx/shared";
 

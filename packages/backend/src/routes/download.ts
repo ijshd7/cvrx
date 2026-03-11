@@ -88,7 +88,9 @@ router.get("/download/:jobId/:docType", (req: Request, res: Response) => {
     ? queryParsed.data.format
     : undefined;
 
-  const formats = preferredFormat ? [preferredFormat] : ["pdf", "docx", "txt", "md"];
+  const formats = preferredFormat
+    ? [preferredFormat]
+    : ["pdf", "docx", "txt", "md"];
 
   for (const format of formats) {
     const filePath = getTempFilePath(jobId, docType, format);

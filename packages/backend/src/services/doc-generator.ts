@@ -30,9 +30,13 @@ function generateTxt(content: string, title: string): Promise<Buffer> {
   const lines = content.split("\n").map((line) => {
     const trimmed = line.trim();
     if (trimmed.startsWith("# "))
-      return stripMarkdownFormatting(trimmed.replace(/^#+\s+/, "")).toUpperCase();
+      return stripMarkdownFormatting(
+        trimmed.replace(/^#+\s+/, ""),
+      ).toUpperCase();
     if (trimmed.startsWith("## "))
-      return stripMarkdownFormatting(trimmed.replace(/^#+\s+/, "")).toUpperCase();
+      return stripMarkdownFormatting(
+        trimmed.replace(/^#+\s+/, ""),
+      ).toUpperCase();
     if (trimmed.startsWith("### "))
       return stripMarkdownFormatting(trimmed.replace(/^#+\s+/, ""));
     return stripMarkdownFormatting(trimmed);
@@ -46,9 +50,7 @@ function generateMd(content: string, title: string): Promise<Buffer> {
   return Promise.resolve(Buffer.from(result, "utf-8"));
 }
 
-export function parseMarkdownContent(
-  content: string,
-): Array<{
+export function parseMarkdownContent(content: string): Array<{
   type: "heading" | "bullet" | "text";
   text: string;
   level?: number;

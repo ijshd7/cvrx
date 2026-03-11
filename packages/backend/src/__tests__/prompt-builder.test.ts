@@ -170,11 +170,7 @@ describe("Prompt Builder", () => {
     });
 
     it("returns distinct instructions for each tone", () => {
-      const tones = [
-        "conversational",
-        "confident",
-        "conservative",
-      ] as const;
+      const tones = ["conversational", "confident", "conservative"] as const;
       const results = tones.map((t) => getToneInstructions(t));
       const unique = new Set(results);
       expect(unique.size).toBe(3);

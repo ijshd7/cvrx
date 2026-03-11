@@ -33,9 +33,7 @@ describe("ToneSelector Component", () => {
     expect(proButton).toHaveClass("border-primary");
     expect(convButton).not.toHaveClass("border-primary");
 
-    rerender(
-      <ToneSelector value="conversational" onChange={handleChange} />,
-    );
+    rerender(<ToneSelector value="conversational" onChange={handleChange} />);
 
     expect(proButton).not.toHaveClass("border-primary");
     expect(convButton).toHaveClass("border-primary");
