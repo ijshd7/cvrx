@@ -1,5 +1,10 @@
-export type OutputFormat = "pdf" | "docx";
+export type OutputFormat = "pdf" | "docx" | "txt" | "md";
 export type DocType = "resume" | "cv" | "cover_letter" | "why_company";
+export type ToneStyle =
+  | "professional"
+  | "conversational"
+  | "confident"
+  | "conservative";
 
 export interface ModelInfo {
   id: string;
@@ -11,6 +16,13 @@ export interface ModelsResponse {
   models: ModelInfo[];
 }
 
+export interface AtsScoreResult {
+  score: number;
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  totalKeywords: number;
+}
+
 export interface GenerateResponse {
   jobId: string;
   resumeDownloadUrl: string;
@@ -18,6 +30,7 @@ export interface GenerateResponse {
   coverLetterDownloadUrl: string;
   whyCompanyDownloadUrl: string;
   outputFormat: OutputFormat;
+  atsScore: AtsScoreResult;
 }
 
 export interface ApiError {
@@ -32,6 +45,7 @@ export type GenerateStep =
   | "generating_cv"
   | "generating_cover_letter"
   | "generating_why_company"
+  | "scoring_ats"
   | "building_documents"
   | "complete";
 

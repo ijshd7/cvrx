@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import type {
   OutputFormat,
+  ToneStyle,
   GenerateProgressEvent,
   GenerateResponse,
 } from "@cvrx/shared";
@@ -17,6 +18,7 @@ import {
   buildWhyCompanyPrompt,
 } from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
+import { calculateAtsScore } from "../services/ats-scorer";
 import {
   ensureTempDir,
   getTempFilePath,
@@ -29,7 +31,10 @@ const generateSchema = z.object({
   model: z.string().min(1),
   jobUrl: z.string().url().optional().or(z.literal("")),
   jobDescription: z.string().optional().or(z.literal("")),
-  outputFormat: z.enum(["pdf", "docx"]),
+  outputFormat: z.enum(["pdf", "docx", "txt", "md"]),
+  tone: z
+    .enum(["professional", "conversational", "confident", "conservative"])
+    .default("professional"),
 });
 
 function sendSSE(res: Response, event: GenerateProgressEvent) {
@@ -50,7 +55,7 @@ router.post(
         return;
       }
 
-      const { model, jobUrl, jobDescription, outputFormat } = parsed.data;
+      const { model, jobUrl, jobDescription, outputFormat, tone } = parsed.data;
 
       if (!req.file) {
         res.status(400).json({ error: "Resume file is required." });
@@ -109,15 +114,26 @@ router.post(
         progress: 20,
         message: "Generating tailored resume...",
       });
-      const resumePrompt = buildResumePrompt(resumeText, finalJobDescription);
-      const cvPrompt = buildCvPrompt(resumeText, finalJobDescription);
+      const toneStyle = tone as ToneStyle;
+      const resumePrompt = buildResumePrompt(
+        resumeText,
+        finalJobDescription,
+        toneStyle,
+      );
+      const cvPrompt = buildCvPrompt(
+        resumeText,
+        finalJobDescription,
+        toneStyle,
+      );
       const coverLetterPrompt = buildCoverLetterPrompt(
         resumeText,
         finalJobDescription,
+        toneStyle,
       );
       const whyCompanyPrompt = buildWhyCompanyPrompt(
         resumeText,
         finalJobDescription,
+        toneStyle,
       );
 
       const [resumeContent, cvContent, coverLetterContent, whyCompanyContent] =
@@ -161,6 +177,14 @@ router.post(
           ),
         ]);
 
+      // Calculate ATS score
+      sendSSE(res, {
+        step: "scoring_ats",
+        progress: 65,
+        message: "Calculating ATS compatibility...",
+      });
+      const atsScore = calculateAtsScore(resumeContent, finalJobDescription);
+
       // Generate documents
       sendSSE(res, {
         step: "building_documents",
@@ -190,6 +214,24 @@ router.post(
       writeTempFile(coverLetterPath, coverLetterDoc);
       writeTempFile(whyCompanyPath, whyCompanyDoc);
 
+      // Save raw markdown content for preview
+      writeTempFile(
+        getTempFilePath(jobId, "resume", "preview"),
+        Buffer.from(resumeContent),
+      );
+      writeTempFile(
+        getTempFilePath(jobId, "cv", "preview"),
+        Buffer.from(cvContent),
+      );
+      writeTempFile(
+        getTempFilePath(jobId, "cover_letter", "preview"),
+        Buffer.from(coverLetterContent),
+      );
+      writeTempFile(
+        getTempFilePath(jobId, "why_company", "preview"),
+        Buffer.from(whyCompanyContent),
+      );
+
       const data: GenerateResponse = {
         jobId,
         resumeDownloadUrl: `/api/download/${jobId}/resume`,
@@ -197,6 +239,7 @@ router.post(
         coverLetterDownloadUrl: `/api/download/${jobId}/cover_letter`,
         whyCompanyDownloadUrl: `/api/download/${jobId}/why_company`,
         outputFormat: format,
+        atsScore,
       };
 
       sendSSE(res, { step: "complete", progress: 100, message: "Done!" });

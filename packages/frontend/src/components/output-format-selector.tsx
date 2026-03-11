@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, FileSpreadsheet, FileOutput } from "lucide-react";
+import { FileText, FileSpreadsheet, FileOutput, FileType, Code } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { OutputFormat } from "@cvrx/shared";
 
@@ -22,6 +22,18 @@ const formats = [
     label: "Word Document",
     sublabel: "Editable, recruiter-friendly",
     icon: <FileSpreadsheet className="h-8 w-8" />,
+  },
+  {
+    value: "txt" as OutputFormat,
+    label: "Plain Text",
+    sublabel: "Simple, lightweight",
+    icon: <FileType className="h-8 w-8" />,
+  },
+  {
+    value: "md" as OutputFormat,
+    label: "Markdown",
+    sublabel: "Developer-friendly",
+    icon: <Code className="h-8 w-8" />,
   },
 ];
 

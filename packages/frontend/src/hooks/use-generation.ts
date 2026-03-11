@@ -7,6 +7,7 @@ import type {
   GenerateProgressEvent,
   GenerateStep,
   OutputFormat,
+  ToneStyle,
 } from "@cvrx/shared";
 
 interface GenerationState {
@@ -34,6 +35,7 @@ export function useGeneration() {
     jobDescription: string;
     resume: File;
     outputFormat: OutputFormat;
+    tone: ToneStyle;
   }) => {
     setState({
       loading: true,
@@ -47,6 +49,7 @@ export function useGeneration() {
     const formData = new FormData();
     formData.append("model", params.model);
     formData.append("outputFormat", params.outputFormat);
+    formData.append("tone", params.tone);
     formData.append("resume", params.resume);
 
     if (params.jobUrl) {

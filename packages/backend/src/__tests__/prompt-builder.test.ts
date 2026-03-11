@@ -4,6 +4,7 @@ import {
   buildCvPrompt,
   buildCoverLetterPrompt,
   buildWhyCompanyPrompt,
+  getToneInstructions,
 } from "../services/prompt-builder";
 
 describe("Prompt Builder", () => {
@@ -143,6 +144,64 @@ describe("Prompt Builder", () => {
     it("requires first person in system prompt", () => {
       const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
       expect(result.system.toLowerCase()).toContain("first person");
+    });
+  });
+
+  describe("getToneInstructions", () => {
+    it("returns empty string for professional tone", () => {
+      const result = getToneInstructions("professional");
+      expect(result).toBe("");
+    });
+
+    it("returns conversational instructions", () => {
+      const result = getToneInstructions("conversational");
+      expect(result.toLowerCase()).toContain("warm");
+      expect(result.toLowerCase()).toContain("approachable");
+    });
+
+    it("returns confident instructions", () => {
+      const result = getToneInstructions("confident");
+      expect(result.toLowerCase()).toContain("assertive");
+    });
+
+    it("returns conservative instructions", () => {
+      const result = getToneInstructions("conservative");
+      expect(result.toLowerCase()).toContain("formal");
+    });
+
+    it("returns distinct instructions for each tone", () => {
+      const tones = [
+        "conversational",
+        "confident",
+        "conservative",
+      ] as const;
+      const results = tones.map((t) => getToneInstructions(t));
+      const unique = new Set(results);
+      expect(unique.size).toBe(3);
+    });
+  });
+
+  describe("tone integration with prompts", () => {
+    it("includes conversational tone in resume prompt", () => {
+      const result = buildResumePrompt(
+        sampleResume,
+        sampleJobDescription,
+        "conversational",
+      );
+      expect(result.system.toLowerCase()).toContain("warm");
+    });
+
+    it("default tone produces same output as professional", () => {
+      const defaultResult = buildResumePrompt(
+        sampleResume,
+        sampleJobDescription,
+      );
+      const proResult = buildResumePrompt(
+        sampleResume,
+        sampleJobDescription,
+        "professional",
+      );
+      expect(defaultResult.system).toBe(proResult.system);
     });
   });
 });

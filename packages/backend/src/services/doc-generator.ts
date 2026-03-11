@@ -17,7 +17,33 @@ export async function generateDocument(
   if (format === "docx") {
     return generateDocx(content, title);
   }
+  if (format === "txt") {
+    return generateTxt(content, title);
+  }
+  if (format === "md") {
+    return generateMd(content, title);
+  }
   return generatePdf(content, title);
+}
+
+function generateTxt(content: string, title: string): Promise<Buffer> {
+  const lines = content.split("\n").map((line) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("# "))
+      return stripMarkdownFormatting(trimmed.replace(/^#+\s+/, "")).toUpperCase();
+    if (trimmed.startsWith("## "))
+      return stripMarkdownFormatting(trimmed.replace(/^#+\s+/, "")).toUpperCase();
+    if (trimmed.startsWith("### "))
+      return stripMarkdownFormatting(trimmed.replace(/^#+\s+/, ""));
+    return stripMarkdownFormatting(trimmed);
+  });
+  const result = `${title}\n${"=".repeat(title.length)}\n\n${lines.join("\n")}`;
+  return Promise.resolve(Buffer.from(result, "utf-8"));
+}
+
+function generateMd(content: string, title: string): Promise<Buffer> {
+  const result = `# ${title}\n\n${content}`;
+  return Promise.resolve(Buffer.from(result, "utf-8"));
 }
 
 export function parseMarkdownContent(

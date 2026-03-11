@@ -15,8 +15,12 @@ AI-powered resume, CV, and cover letter generator. Provide a job listing and you
 - **Model Selection** — Choose from any LLM available on OpenRouter (Claude, GPT-4, Llama, Gemini, etc.)
 - **Job Listing Scraping** — Paste a URL and the app scrapes the job description automatically, with a manual text fallback
 - **Multiple Upload Formats** — Upload your resume as PDF, DOCX, or plain text
-- **Three Output Documents** — Get a concise, ATS-optimized resume, a comprehensive CV, and a tailored cover letter
-- **PDF & DOCX Output** — Download your documents in either format
+- **Four Output Documents** — Get a concise, ATS-optimized resume, a comprehensive CV, a tailored cover letter, and a personalized "Why This Company" statement
+- **Flexible Output Formats** — Download documents as PDF, DOCX, Markdown, or plain text
+- **Batch Download** — Download all four documents at once in a ZIP archive
+- **Prompt Tone Control** — Choose document tone: Professional, Conversational, Confident, or Conservative
+- **ATS Compatibility Scoring** — Get an estimated ATS compatibility score with matched and missing keywords
+- **Document Preview** — Preview generated documents in-browser with full markdown rendering before downloading
 - **Containerized** — Full Docker Compose setup for easy deployment
 
 ## Tech Stack
@@ -139,8 +143,10 @@ cvrx/
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/models` | List available OpenRouter models |
-| `POST` | `/api/generate` | Generate resume, CV, and cover letter (multipart form) |
-| `GET` | `/api/download/:jobId/:docType?format=pdf\|docx` | Download generated document |
+| `POST` | `/api/generate` | Generate documents with ATS scoring (multipart form, SSE stream) |
+| `GET` | `/api/download/:jobId/:docType?format=pdf\|docx\|txt\|md` | Download a single generated document |
+| `GET` | `/api/download/:jobId/all?format=pdf\|docx\|txt\|md` | Download all documents as ZIP archive |
+| `GET` | `/api/preview/:jobId/:docType` | Get raw markdown preview of a generated document |
 | `GET` | `/api/health` | Health check |
 
 ## How It Works
@@ -148,9 +154,48 @@ cvrx/
 1. **Select a model** from the dropdown (fetched from OpenRouter)
 2. **Provide the job listing** via URL (auto-scraped) or paste the description manually
 3. **Upload your current resume** (PDF, DOCX, or TXT)
-4. **Choose output format** (PDF or DOCX)
-5. **Submit** — the backend scrapes the job description, parses your resume, sends both to the selected LLM with tailored prompts, and generates three documents
-6. **Download** your tailored resume, comprehensive CV, and personalized cover letter
+4. **Choose output format** (PDF, DOCX, Markdown, or plain text) and **tone** (Professional, Conversational, Confident, or Conservative)
+5. **Submit** — the backend:
+   - Scrapes and parses the job description
+   - Extracts and parses your resume
+   - Sends both to the selected LLM with tone-aware tailored prompts
+   - Generates four documents (resume, CV, cover letter, "Why This Company")
+   - Calculates ATS compatibility score with keyword matching
+6. **Review** your documents with the in-browser preview (markdown rendering) before downloading
+7. **Download** all documents individually or batch download as a ZIP archive in your chosen format
+
+## Recent Enhancements
+
+### Output Format Expansion
+Download your documents as PDF, DOCX, Markdown (.md), or plain text (.txt). Choose the format that best fits your workflow—PDF for traditional ATS systems, DOCX for easy editing, or Markdown/text for developer-friendly formats.
+
+### Prompt Tone Control
+Select from four document tones to match your communication style:
+- **Professional** — Polished and formal (default)
+- **Conversational** — Warm and approachable with natural language
+- **Confident** — Direct and assertive, leading with impact
+- **Conservative** — Formal and traditional, institutional style
+
+The LLM applies tone-specific instructions when generating content, ensuring consistency across all four documents.
+
+### Batch Download
+Download all four documents at once as a ZIP archive instead of clicking multiple download buttons. Perfect for submitting complete application packages.
+
+### ATS Compatibility Scoring
+After generation, the app calculates an estimated ATS (Applicant Tracking System) compatibility score by:
+- Extracting key technical and skill keywords from the job description
+- Checking which keywords appear in your generated resume
+- Displaying matched keywords (in green) and missing keywords (in outline)
+- Providing a percentage score with color-coded feedback (green ≥75%, yellow 50-74%, red <50%)
+
+Use this score to identify gaps and make targeted edits before submitting.
+
+### Document Preview
+Review generated documents directly in your browser before downloading. The preview modal includes:
+- Tabbed navigation to switch between resume, CV, cover letter, and "Why This Company"
+- Full Markdown rendering with proper formatting
+- Quick access to the Eye icon next to each document's download button
+- Real-time preview updates as you switch between documents
 
 ## Contributing
 

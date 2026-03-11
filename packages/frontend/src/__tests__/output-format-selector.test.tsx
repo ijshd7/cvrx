@@ -4,12 +4,14 @@ import userEvent from "@testing-library/user-event";
 import { OutputFormatSelector } from "@/components/output-format-selector";
 
 describe("OutputFormatSelector Component", () => {
-  it("renders PDF and Word Document options", () => {
+  it("renders all four format options", () => {
     const handleChange = vi.fn();
     render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
 
     expect(screen.getByText("PDF")).toBeInTheDocument();
     expect(screen.getByText("Word Document")).toBeInTheDocument();
+    expect(screen.getByText("Plain Text")).toBeInTheDocument();
+    expect(screen.getByText("Markdown")).toBeInTheDocument();
   });
 
   it("displays output format heading", () => {
@@ -60,6 +62,30 @@ describe("OutputFormatSelector Component", () => {
     await user.click(pdfButton);
 
     expect(handleChange).toHaveBeenCalledWith("pdf");
+  });
+
+  it("calls onChange when Plain Text is selected", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
+
+    const txtButton = screen.getByRole("button", { name: /Plain Text/ });
+    await user.click(txtButton);
+
+    expect(handleChange).toHaveBeenCalledWith("txt");
+  });
+
+  it("calls onChange when Markdown is selected", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    render(<OutputFormatSelector value="pdf" onChange={handleChange} />);
+
+    const mdButton = screen.getByRole("button", { name: /Markdown/ });
+    await user.click(mdButton);
+
+    expect(handleChange).toHaveBeenCalledWith("md");
   });
 
   it("renders format buttons with proper styling", () => {

@@ -6,6 +6,7 @@ import { startCleanupScheduler } from "./utils/temp-files";
 import modelsRouter from "./routes/models";
 import generateRouter from "./routes/generate";
 import downloadRouter from "./routes/download";
+import previewRouter from "./routes/preview";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api", modelsRouter);
 app.use("/api", generateRouter);
 app.use("/api", downloadRouter);
+app.use("/api", previewRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {

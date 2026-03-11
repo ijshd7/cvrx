@@ -11,6 +11,7 @@ const STEPS: { key: GenerateStep; label: string }[] = [
   { key: "generating_cv", label: "Writing CV" },
   { key: "generating_cover_letter", label: "Writing Cover Letter" },
   { key: "generating_why_company", label: "Writing 'Why This Company?'" },
+  { key: "scoring_ats", label: "Scoring ATS Compatibility" },
   { key: "building_documents", label: "Building Documents" },
   { key: "complete", label: "Complete" },
 ];

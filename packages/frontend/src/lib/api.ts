@@ -98,3 +98,19 @@ export async function submitGeneration(
 export function getDownloadUrl(path: string): string {
   return `${API_BASE}${path.startsWith("/api") ? path.replace("/api", "") : path}`;
 }
+
+export function getAllDownloadUrl(jobId: string, format: string): string {
+  return `${API_BASE}/download/${jobId}/all?format=${format}`;
+}
+
+export async function fetchPreview(
+  jobId: string,
+  docType: string,
+): Promise<string> {
+  const res = await fetch(`${API_BASE}/preview/${jobId}/${docType}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch preview");
+  }
+  const data = (await res.json()) as { content: string };
+  return data.content;
+}

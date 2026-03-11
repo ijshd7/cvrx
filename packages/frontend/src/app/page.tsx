@@ -14,12 +14,13 @@ import { ModelSelector } from "@/components/model-selector";
 import { JobInput } from "@/components/job-input";
 import { ResumeUpload } from "@/components/resume-upload";
 import { OutputFormatSelector } from "@/components/output-format-selector";
+import { ToneSelector } from "@/components/tone-selector";
 import { DownloadCard } from "@/components/download-card";
 import { WizardStepIndicator } from "@/components/wizard-step-indicator";
 import { GenerationTimeline } from "@/components/generation-timeline";
 import { useGeneration } from "@/hooks/use-generation";
 import { toast } from "sonner";
-import type { OutputFormat } from "@cvrx/shared";
+import type { OutputFormat, ToneStyle } from "@cvrx/shared";
 import { Bot, Briefcase, FileUp, FileOutput, CheckCircle2 } from "lucide-react";
 
 const WIZARD_STEPS = [
@@ -36,6 +37,7 @@ export default function Home() {
   const [jobDescription, setJobDescription] = useState("");
   const [resume, setResume] = useState<File | null>(null);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>("pdf");
+  const [tone, setTone] = useState<ToneStyle>("professional");
 
   const {
     loading,
@@ -89,6 +91,7 @@ export default function Home() {
       jobDescription,
       resume,
       outputFormat,
+      tone,
     });
   };
 
@@ -158,10 +161,13 @@ export default function Home() {
                       <ResumeUpload file={resume} onFileChange={setResume} />
                     )}
                     {wizardStep === 3 && (
-                      <OutputFormatSelector
-                        value={outputFormat}
-                        onChange={setOutputFormat}
-                      />
+                      <div className="space-y-8">
+                        <OutputFormatSelector
+                          value={outputFormat}
+                          onChange={setOutputFormat}
+                        />
+                        <ToneSelector value={tone} onChange={setTone} />
+                      </div>
                     )}
                   </CardContent>
                 </Card>

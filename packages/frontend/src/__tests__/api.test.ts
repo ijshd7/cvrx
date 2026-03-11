@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getDownloadUrl } from "@/lib/api";
+import { getDownloadUrl, getAllDownloadUrl } from "@/lib/api";
 
 describe("API Utilities", () => {
   describe("getDownloadUrl", () => {
@@ -42,6 +42,19 @@ describe("API Utilities", () => {
       // If a path happens to have /api in it (unusual but possible)
       const result = getDownloadUrl("/api/api/test");
       expect(result).toBe("/api/api/test");
+    });
+  });
+
+  describe("getAllDownloadUrl", () => {
+    it("constructs correct URL with jobId and format", () => {
+      const result = getAllDownloadUrl("abc-123", "pdf");
+      expect(result).toBe("/api/download/abc-123/all?format=pdf");
+    });
+
+    it("works with different formats", () => {
+      expect(getAllDownloadUrl("id", "docx")).toContain("format=docx");
+      expect(getAllDownloadUrl("id", "txt")).toContain("format=txt");
+      expect(getAllDownloadUrl("id", "md")).toContain("format=md");
     });
   });
 });

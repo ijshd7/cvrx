@@ -3,6 +3,7 @@ import {
   parseMarkdownContent,
   stripMarkdownFormatting,
   createTextRuns,
+  generateDocument,
 } from "../services/doc-generator";
 
 describe("Markdown Content Parser", () => {
@@ -156,6 +157,62 @@ Plain paragraph text`;
     it("handles empty strings", () => {
       const result = createTextRuns("");
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe("generateDocument with txt format", () => {
+    it("returns a Buffer", async () => {
+      const result = await generateDocument("Some content", "txt", "Test");
+      expect(Buffer.isBuffer(result)).toBe(true);
+    });
+
+    it("includes the title at the top", async () => {
+      const result = await generateDocument("Some content", "txt", "Resume");
+      const text = result.toString("utf-8");
+      expect(text.startsWith("Resume\n")).toBe(true);
+    });
+
+    it("strips markdown formatting", async () => {
+      const result = await generateDocument(
+        "**bold** and *italic*",
+        "txt",
+        "Test",
+      );
+      const text = result.toString("utf-8");
+      expect(text).toContain("bold and italic");
+      expect(text).not.toContain("**");
+      expect(text).not.toContain("*italic*");
+    });
+
+    it("converts headings to uppercase", async () => {
+      const result = await generateDocument(
+        "## Experience\n- Did stuff",
+        "txt",
+        "Test",
+      );
+      const text = result.toString("utf-8");
+      expect(text).toContain("EXPERIENCE");
+    });
+  });
+
+  describe("generateDocument with md format", () => {
+    it("returns a Buffer", async () => {
+      const result = await generateDocument("Some content", "md", "Test");
+      expect(Buffer.isBuffer(result)).toBe(true);
+    });
+
+    it("prepends the title as a markdown heading", async () => {
+      const result = await generateDocument("Some content", "md", "Resume");
+      const text = result.toString("utf-8");
+      expect(text.startsWith("# Resume\n")).toBe(true);
+    });
+
+    it("preserves markdown formatting", async () => {
+      const content = "## Experience\n- **Led** team projects";
+      const result = await generateDocument(content, "md", "Test");
+      const text = result.toString("utf-8");
+      expect(text).toContain("## Experience");
+      expect(text).toContain("**Led**");
     });
   });
 });

@@ -1,6 +1,23 @@
+import type { ToneStyle } from "@cvrx/shared";
+
+export function getToneInstructions(tone: ToneStyle): string {
+  switch (tone) {
+    case "conversational":
+      return "\n\nTone adjustment: Write in a warm, approachable tone. Use contractions naturally. Aim for a tone that feels like a knowledgeable colleague sharing their experience.";
+    case "confident":
+      return "\n\nTone adjustment: Write in a direct, assertive tone. Lead with impact and results. Use strong, definitive language without hedging.";
+    case "conservative":
+      return "\n\nTone adjustment: Write in a formal, traditional tone. Use complete sentences, avoid contractions, and maintain a reserved, institutional style.";
+    case "professional":
+    default:
+      return "";
+  }
+}
+
 export function buildResumePrompt(
   resumeText: string,
   jobDescription: string,
+  tone: ToneStyle = "professional",
 ): { system: string; user: string } {
   return {
     system: `You are an expert resume writer and career coach. Your task is to create a tailored, ATS-optimized resume based on the candidate's existing resume and a specific job description.
@@ -32,7 +49,7 @@ Writing style rules (critical):
 - Write in a natural, direct, human tone. Prefer concrete language over buzzwords.
 - Vary sentence structure. Avoid starting every bullet point the same way.
 
-Output the resume content as clean, well-structured text with clear section headers. Use markdown formatting for structure (## for sections, **bold** for emphasis, - for bullet points).`,
+Output the resume content as clean, well-structured text with clear section headers. Use markdown formatting for structure (## for sections, **bold** for emphasis, - for bullet points).${getToneInstructions(tone)}`,
 
     user: `Here is my current resume:
 
@@ -53,6 +70,7 @@ Please create a tailored resume optimized for this specific job posting.`,
 export function buildCvPrompt(
   resumeText: string,
   jobDescription: string,
+  tone: ToneStyle = "professional",
 ): { system: string; user: string } {
   return {
     system: `You are an expert CV writer and career consultant. Your task is to create a comprehensive Curriculum Vitae (CV) based on the candidate's existing resume and a specific job description.
@@ -85,7 +103,7 @@ Writing style rules (critical):
 - Write in a natural, direct, human tone. Prefer concrete language over buzzwords.
 - Vary sentence structure. Avoid starting every bullet point the same way.
 
-Output the CV content as clean, well-structured text with clear section headers. Use markdown formatting for structure (## for sections, **bold** for emphasis, - for bullet points).`,
+Output the CV content as clean, well-structured text with clear section headers. Use markdown formatting for structure (## for sections, **bold** for emphasis, - for bullet points).${getToneInstructions(tone)}`,
 
     user: `Here is my current resume:
 
@@ -106,6 +124,7 @@ Please create a comprehensive CV that thoroughly presents my qualifications whil
 export function buildCoverLetterPrompt(
   resumeText: string,
   jobDescription: string,
+  tone: ToneStyle = "professional",
 ): { system: string; user: string } {
   return {
     system: `You are an expert cover letter writer and career coach. Your task is to create a tailored, compelling cover letter based on the candidate's existing resume and a specific job description.
@@ -131,7 +150,7 @@ Writing style rules (critical):
 - Write in a natural, direct, human tone. Be confident but not arrogant.
 - Vary sentence structure. Avoid formulaic paragraph openings.
 
-Output the cover letter as clean text. Use markdown formatting minimally (no section headers needed, just well-structured paragraphs).`,
+Output the cover letter as clean text. Use markdown formatting minimally (no section headers needed, just well-structured paragraphs).${getToneInstructions(tone)}`,
 
     user: `Here is my current resume:
 
@@ -152,6 +171,7 @@ Please create a tailored cover letter for this specific job posting.`,
 export function buildWhyCompanyPrompt(
   resumeText: string,
   jobDescription: string,
+  tone: ToneStyle = "professional",
 ): { system: string; user: string } {
   return {
     system: `You are a career coach helping a candidate prepare for a job interview. Your task is to write a concise, genuine answer to the question "Why do you want to work at this company?"
@@ -171,7 +191,7 @@ Writing style rules (critical):
 - Write in first person
 - Keep the tone natural and direct
 
-Output the answer as plain text with no markdown formatting, headers, or bullet points. Just the 3-4 sentence answer.`,
+Output the answer as plain text with no markdown formatting, headers, or bullet points. Just the 3-4 sentence answer.${getToneInstructions(tone)}`,
 
     user: `Here is my current resume:
 
