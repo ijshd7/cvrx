@@ -3,6 +3,7 @@ import {
   buildResumePrompt,
   buildCvPrompt,
   buildCoverLetterPrompt,
+  buildWhyCompanyPrompt,
 } from "../services/prompt-builder";
 
 describe("Prompt Builder", () => {
@@ -107,6 +108,41 @@ describe("Prompt Builder", () => {
     it("mentions hiring manager greeting in system prompt", () => {
       const result = buildCoverLetterPrompt(sampleResume, sampleJobDescription);
       expect(result.system).toContain("Dear Hiring Manager");
+    });
+  });
+
+  describe("buildWhyCompanyPrompt", () => {
+    it("returns system and user prompts", () => {
+      const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
+      expect(result).toHaveProperty("system");
+      expect(result).toHaveProperty("user");
+      expect(typeof result.system).toBe("string");
+      expect(typeof result.user).toBe("string");
+    });
+
+    it("includes resume text in user prompt", () => {
+      const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
+      expect(result.user).toContain(sampleResume);
+    });
+
+    it("includes job description in user prompt", () => {
+      const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
+      expect(result.user).toContain(sampleJobDescription);
+    });
+
+    it("mentions company in system prompt", () => {
+      const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
+      expect(result.system.toLowerCase()).toContain("company");
+    });
+
+    it("specifies 3-4 sentences in system prompt", () => {
+      const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
+      expect(result.system).toContain("3-4 sentences");
+    });
+
+    it("requires first person in system prompt", () => {
+      const result = buildWhyCompanyPrompt(sampleResume, sampleJobDescription);
+      expect(result.system.toLowerCase()).toContain("first person");
     });
   });
 });

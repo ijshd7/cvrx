@@ -14,6 +14,7 @@ import {
   buildResumePrompt,
   buildCvPrompt,
   buildCoverLetterPrompt,
+  buildWhyCompanyPrompt,
 } from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
 import {
@@ -114,34 +115,51 @@ router.post(
         resumeText,
         finalJobDescription,
       );
+      const whyCompanyPrompt = buildWhyCompanyPrompt(
+        resumeText,
+        finalJobDescription,
+      );
 
-      const [resumeContent, cvContent, coverLetterContent] = await Promise.all([
-        generateContent(model, resumePrompt.system, resumePrompt.user).then(
-          (result) => {
+      const [resumeContent, cvContent, coverLetterContent, whyCompanyContent] =
+        await Promise.all([
+          generateContent(model, resumePrompt.system, resumePrompt.user).then(
+            (result) => {
+              sendSSE(res, {
+                step: "generating_cv",
+                progress: 30,
+                message: "Generating CV...",
+              });
+              return result;
+            },
+          ),
+          generateContent(model, cvPrompt.system, cvPrompt.user).then(
+            (result) => {
+              sendSSE(res, {
+                step: "generating_cover_letter",
+                progress: 42,
+                message: "Generating cover letter...",
+              });
+              return result;
+            },
+          ),
+          generateContent(
+            model,
+            coverLetterPrompt.system,
+            coverLetterPrompt.user,
+          ).then((result) => {
             sendSSE(res, {
-              step: "generating_cv",
-              progress: 35,
-              message: "Generating CV...",
+              step: "generating_why_company",
+              progress: 54,
+              message: "Generating 'Why this company?' response...",
             });
             return result;
-          },
-        ),
-        generateContent(model, cvPrompt.system, cvPrompt.user).then(
-          (result) => {
-            sendSSE(res, {
-              step: "generating_cover_letter",
-              progress: 50,
-              message: "Generating cover letter...",
-            });
-            return result;
-          },
-        ),
-        generateContent(
-          model,
-          coverLetterPrompt.system,
-          coverLetterPrompt.user,
-        ),
-      ]);
+          }),
+          generateContent(
+            model,
+            whyCompanyPrompt.system,
+            whyCompanyPrompt.user,
+          ),
+        ]);
 
       // Generate documents
       sendSSE(res, {
@@ -150,11 +168,13 @@ router.post(
         message: "Building documents...",
       });
       const format = outputFormat as OutputFormat;
-      const [resumeDoc, cvDoc, coverLetterDoc] = await Promise.all([
-        generateDocument(resumeContent, format, "Resume"),
-        generateDocument(cvContent, format, "Curriculum Vitae"),
-        generateDocument(coverLetterContent, format, "Cover Letter"),
-      ]);
+      const [resumeDoc, cvDoc, coverLetterDoc, whyCompanyDoc] =
+        await Promise.all([
+          generateDocument(resumeContent, format, "Resume"),
+          generateDocument(cvContent, format, "Curriculum Vitae"),
+          generateDocument(coverLetterContent, format, "Cover Letter"),
+          generateDocument(whyCompanyContent, format, "Why This Company"),
+        ]);
 
       // Save to temp directory
       const jobId = uuidv4();
@@ -163,16 +183,19 @@ router.post(
       const resumePath = getTempFilePath(jobId, "resume", format);
       const cvPath = getTempFilePath(jobId, "cv", format);
       const coverLetterPath = getTempFilePath(jobId, "cover_letter", format);
+      const whyCompanyPath = getTempFilePath(jobId, "why_company", format);
 
       writeTempFile(resumePath, resumeDoc);
       writeTempFile(cvPath, cvDoc);
       writeTempFile(coverLetterPath, coverLetterDoc);
+      writeTempFile(whyCompanyPath, whyCompanyDoc);
 
       const data: GenerateResponse = {
         jobId,
         resumeDownloadUrl: `/api/download/${jobId}/resume`,
         cvDownloadUrl: `/api/download/${jobId}/cv`,
         coverLetterDownloadUrl: `/api/download/${jobId}/cover_letter`,
+        whyCompanyDownloadUrl: `/api/download/${jobId}/why_company`,
         outputFormat: format,
       };
 

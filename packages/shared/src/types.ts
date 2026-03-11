@@ -1,5 +1,5 @@
 export type OutputFormat = "pdf" | "docx";
-export type DocType = "resume" | "cv" | "cover_letter";
+export type DocType = "resume" | "cv" | "cover_letter" | "why_company";
 
 export interface ModelInfo {
   id: string;
@@ -16,6 +16,7 @@ export interface GenerateResponse {
   resumeDownloadUrl: string;
   cvDownloadUrl: string;
   coverLetterDownloadUrl: string;
+  whyCompanyDownloadUrl: string;
   outputFormat: OutputFormat;
 }
 
@@ -30,6 +31,7 @@ export type GenerateStep =
   | "generating_resume"
   | "generating_cv"
   | "generating_cover_letter"
+  | "generating_why_company"
   | "building_documents"
   | "complete";
 

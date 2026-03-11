@@ -16,6 +16,8 @@ describe("DownloadCard Component", () => {
     cvDownloadUrl: "/api/download/123e4567-e89b-12d3-a456-426614174000/cv",
     coverLetterDownloadUrl:
       "/api/download/123e4567-e89b-12d3-a456-426614174000/cover_letter",
+    whyCompanyDownloadUrl:
+      "/api/download/123e4567-e89b-12d3-a456-426614174000/why_company",
     outputFormat: "pdf",
   };
 
@@ -36,6 +38,7 @@ describe("DownloadCard Component", () => {
     expect(screen.getByText("Resume")).toBeInTheDocument();
     expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     expect(screen.getByText("Cover Letter")).toBeInTheDocument();
+    expect(screen.getByText("Why This Company")).toBeInTheDocument();
     expect(screen.getAllByText("PDF")).toBeTruthy();
   });
 
@@ -48,13 +51,14 @@ describe("DownloadCard Component", () => {
     expect(screen.getByText("Resume")).toBeInTheDocument();
     expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     expect(screen.getByText("Cover Letter")).toBeInTheDocument();
+    expect(screen.getByText("Why This Company")).toBeInTheDocument();
     expect(screen.getAllByText("DOCX")).toBeTruthy();
   });
 
-  it("renders three download buttons", () => {
+  it("renders four download buttons", () => {
     render(<DownloadCard result={mockResult} />);
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(3);
+    expect(buttons.length).toBeGreaterThanOrEqual(4);
   });
 
   it("sets correct href for resume download link", () => {
@@ -82,6 +86,18 @@ describe("DownloadCard Component", () => {
       expect.stringContaining("cover_letter"),
     );
     expect(coverLetterLink).toHaveAttribute("download");
+  });
+
+  it("sets correct href for why company download link", () => {
+    render(<DownloadCard result={mockResult} />);
+    const whyCompanyLink = screen.getByRole("link", {
+      name: /Why This Company/,
+    });
+    expect(whyCompanyLink).toHaveAttribute(
+      "href",
+      expect.stringContaining("why_company"),
+    );
+    expect(whyCompanyLink).toHaveAttribute("download");
   });
 
   it("applies proper styling classes to links", () => {

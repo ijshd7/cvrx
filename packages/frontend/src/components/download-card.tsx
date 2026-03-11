@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, BookOpen, Mail, CheckCircle2 } from "lucide-react";
+import { Download, FileText, BookOpen, Mail, MessageSquareText, CheckCircle2 } from "lucide-react";
 import type { GenerateResponse } from "@cvrx/shared";
 import { getDownloadUrl } from "@/lib/api";
 
@@ -101,6 +101,31 @@ export function DownloadCard({ result }: DownloadCardProps) {
                 <Mail className="h-5 w-5 text-primary" />
                 <div className="text-left">
                   <p className="font-medium text-sm">Cover Letter</p>
+                  <p className="text-xs text-muted-foreground">{ext}</p>
+                </div>
+              </div>
+              <motion.div
+                whileHover={{ x: 3 }}
+                className="text-primary group-hover:translate-x-1 transition-transform"
+              >
+                <Download className="h-5 w-5" />
+              </motion.div>
+            </motion.button>
+          </a>
+
+          <a
+            href={getDownloadUrl(result.whyCompanyDownloadUrl)}
+            download
+            className="block"
+          >
+            <motion.button
+              whileHover={{ x: 4 }}
+              className="w-full flex items-center justify-between gap-4 px-4 py-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <MessageSquareText className="h-5 w-5 text-primary" />
+                <div className="text-left">
+                  <p className="font-medium text-sm">Why This Company</p>
                   <p className="text-xs text-muted-foreground">{ext}</p>
                 </div>
               </div>

@@ -148,3 +148,43 @@ ${jobDescription}
 Please create a tailored cover letter for this specific job posting.`,
   };
 }
+
+export function buildWhyCompanyPrompt(
+  resumeText: string,
+  jobDescription: string,
+): { system: string; user: string } {
+  return {
+    system: `You are a career coach helping a candidate prepare for a job interview. Your task is to write a concise, genuine answer to the question "Why do you want to work at this company?"
+
+Output rules:
+- Write exactly 3-4 sentences
+- Extract the company name from the job description. If no company name is found, use "this company" as a placeholder.
+- The first sentence should name the company explicitly
+- Connect the candidate's actual background and skills (from their resume) to the company's mission, products, or role requirements (from the job description)
+- Be specific: reference real details from the job description (company products, technologies, mission, team structure) rather than generic praise
+- Sound authentic and conversational, not rehearsed or corporate
+- Do NOT fabricate any experience or skills not present in the resume
+
+Writing style rules (critical):
+- Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
+- Avoid overused AI-associated phrases. Do not use: "Passionate", "Dynamic", "Innovative", "Cutting-edge", "Synergy", "Leverage", "Delve", "Landscape", "Robust", "Holistic", "Pivotal", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower".
+- Write in first person
+- Keep the tone natural and direct
+
+Output the answer as plain text with no markdown formatting, headers, or bullet points. Just the 3-4 sentence answer.`,
+
+    user: `Here is my current resume:
+
+---
+${resumeText}
+---
+
+Here is the job description:
+
+---
+${jobDescription}
+---
+
+Please write a 3-4 sentence answer to "Why do you want to work at this company?" that connects my background to this specific role and company.`,
+  };
+}
