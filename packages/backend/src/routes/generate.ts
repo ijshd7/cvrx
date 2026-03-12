@@ -19,6 +19,7 @@ import {
   buildLinkedInMessagePrompt,
 } from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
+import { sanitizeGeneratedContent } from "../services/content-sanitizer";
 import { calculateAtsScore } from "../services/ats-scorer";
 import {
   ensureTempDir,
@@ -157,7 +158,7 @@ router.post(
                 progress: 25,
                 message: "Generating CV...",
               });
-              return result;
+              return sanitizeGeneratedContent(result);
             },
           ),
           generateContent(model, cvPrompt.system, cvPrompt.user).then(
@@ -167,7 +168,7 @@ router.post(
                 progress: 35,
                 message: "Generating cover letter...",
               });
-              return result;
+              return sanitizeGeneratedContent(result);
             },
           ),
           generateContent(
@@ -180,7 +181,7 @@ router.post(
               progress: 45,
               message: "Generating 'Why this company?' response...",
             });
-            return result;
+            return sanitizeGeneratedContent(result);
           }),
           generateContent(
             model,
@@ -192,13 +193,13 @@ router.post(
               progress: 55,
               message: "Generating LinkedIn outreach messages...",
             });
-            return result;
+            return sanitizeGeneratedContent(result);
           }),
           generateContent(
             model,
             linkedinMessagePrompt.system,
             linkedinMessagePrompt.user,
-          ),
+          ).then((result) => sanitizeGeneratedContent(result)),
         ]);
 
       // Calculate ATS score

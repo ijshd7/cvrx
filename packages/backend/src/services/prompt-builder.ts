@@ -1,4 +1,7 @@
 import type { ToneStyle } from "@cvrx/shared";
+import { BANNED_PHRASES } from "../constants/writing-style";
+
+const BANNED_PHRASES_STR = BANNED_PHRASES.join(", ");
 
 export function getToneInstructions(tone: ToneStyle): string {
   switch (tone) {
@@ -51,7 +54,7 @@ Strict content rules:
 
 Writing style rules (critical):
 - Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
-- Avoid overused AI-associated phrases. Do not use: "Results-driven", "Proven track record", "Leveraging", "Spearheaded", "Cutting-edge", "Synergy", "Delve", "Tapestry", "Landscape", "Robust", "Holistic", "Pivotal", "Harness", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower", "Passionate", "Dynamic", "Innovative".
+- Avoid overused AI-associated phrases. Do not use: ${BANNED_PHRASES_STR}.
 - Write in a natural, direct, human tone. Prefer concrete language over buzzwords.
 - Vary sentence structure. Avoid starting every bullet point the same way.
 
@@ -106,7 +109,7 @@ Strict content rules:
 
 Writing style rules (critical):
 - Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
-- Avoid overused AI-associated phrases. Do not use: "Results-driven", "Proven track record", "Leveraging", "Spearheaded", "Cutting-edge", "Synergy", "Delve", "Tapestry", "Landscape", "Robust", "Holistic", "Pivotal", "Harness", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower", "Passionate", "Dynamic", "Innovative".
+- Avoid overused AI-associated phrases. Do not use: ${BANNED_PHRASES_STR}.
 - Write in a natural, direct, human tone. Prefer concrete language over buzzwords.
 - Vary sentence structure. Avoid starting every bullet point the same way.
 
@@ -154,7 +157,7 @@ Strict content rules:
 
 Writing style rules (critical):
 - Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
-- Avoid overused AI-associated phrases. Do not use: "Results-driven", "Proven track record", "Leveraging", "Spearheaded", "Cutting-edge", "Synergy", "Delve", "Tapestry", "Landscape", "Robust", "Holistic", "Pivotal", "Harness", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower", "Passionate", "Dynamic", "Innovative".
+- Avoid overused AI-associated phrases. Do not use: ${BANNED_PHRASES_STR}.
 - Write in a natural, direct, human tone. Be confident but not arrogant.
 - Vary sentence structure. Avoid formulaic paragraph openings.
 
@@ -196,7 +199,7 @@ Output rules:
 
 Writing style rules (critical):
 - Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
-- Avoid overused AI-associated phrases. Do not use: "Passionate", "Dynamic", "Innovative", "Cutting-edge", "Synergy", "Leverage", "Delve", "Landscape", "Robust", "Holistic", "Pivotal", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower".
+- Avoid overused AI-associated phrases. Do not use: ${BANNED_PHRASES_STR}.
 - Write in first person
 - Keep the tone natural and direct
 
@@ -252,7 +255,7 @@ Strict content rules:
 
 Writing style rules (critical):
 - Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
-- Avoid overused AI-associated phrases. Do not use: "Passionate", "Dynamic", "Innovative", "Cutting-edge", "Synergy", "Leverage", "Delve", "Landscape", "Robust", "Holistic", "Pivotal", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower".
+- Avoid overused AI-associated phrases. Do not use: ${BANNED_PHRASES_STR}.
 - Write in first person
 - Keep the tone natural and direct
 

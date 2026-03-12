@@ -10,6 +10,7 @@ import {
   buildLinkedInMessagePrompt,
 } from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
+import { sanitizeGeneratedContent } from "../services/content-sanitizer";
 import { getTempFilePath, readTempFile, writeTempFile } from "../utils/temp-files";
 
 const router: ReturnType<typeof Router> = Router();
@@ -82,7 +83,8 @@ router.post("/regenerate", async (req: Request, res: Response) => {
     const prompt = buildPrompt(resumeText, jobDescription, tone, additionalContext);
 
     // Generate content
-    const content = await generateContent(model, prompt.system, prompt.user);
+    const rawContent = await generateContent(model, prompt.system, prompt.user);
+    const content = sanitizeGeneratedContent(rawContent);
 
     // Generate formatted document
     const docBuffer = await generateDocument(content, outputFormat, DOC_TITLES[docType]);
