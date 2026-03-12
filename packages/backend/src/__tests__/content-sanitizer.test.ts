@@ -42,7 +42,7 @@ describe("content-sanitizer", () => {
       const output = sanitizeGeneratedContent(input);
       expect(output).toContain("Focused on results");
       expect(output).toContain("Using");
-      expect(output).toContain("Modern");
+      expect(output).toContain("modern"); // case preserved from "cutting-edge"
       expect(output).toContain("Led");
     });
   });
