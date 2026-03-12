@@ -16,6 +16,7 @@ import {
   buildCvPrompt,
   buildCoverLetterPrompt,
   buildWhyCompanyPrompt,
+  buildLinkedInMessagePrompt,
 } from "../services/prompt-builder";
 import { generateDocument } from "../services/doc-generator";
 import { calculateAtsScore } from "../services/ats-scorer";
@@ -35,6 +36,7 @@ const generateSchema = z.object({
   tone: z
     .enum(["professional", "conversational", "confident", "conservative"])
     .default("professional"),
+  additionalContext: z.string().optional().or(z.literal("")),
 });
 
 function sendSSE(res: Response, event: GenerateProgressEvent) {
@@ -55,7 +57,7 @@ router.post(
         return;
       }
 
-      const { model, jobUrl, jobDescription, outputFormat, tone } = parsed.data;
+      const { model, jobUrl, jobDescription, outputFormat, tone, additionalContext } = parsed.data;
 
       if (!req.file) {
         res.status(400).json({ error: "Resume file is required." });
@@ -119,30 +121,40 @@ router.post(
         resumeText,
         finalJobDescription,
         toneStyle,
+        additionalContext,
       );
       const cvPrompt = buildCvPrompt(
         resumeText,
         finalJobDescription,
         toneStyle,
+        additionalContext,
       );
       const coverLetterPrompt = buildCoverLetterPrompt(
         resumeText,
         finalJobDescription,
         toneStyle,
+        additionalContext,
       );
       const whyCompanyPrompt = buildWhyCompanyPrompt(
         resumeText,
         finalJobDescription,
         toneStyle,
+        additionalContext,
+      );
+      const linkedinMessagePrompt = buildLinkedInMessagePrompt(
+        resumeText,
+        finalJobDescription,
+        toneStyle,
+        additionalContext,
       );
 
-      const [resumeContent, cvContent, coverLetterContent, whyCompanyContent] =
+      const [resumeContent, cvContent, coverLetterContent, whyCompanyContent, linkedinMessageContent] =
         await Promise.all([
           generateContent(model, resumePrompt.system, resumePrompt.user).then(
             (result) => {
               sendSSE(res, {
                 step: "generating_cv",
-                progress: 30,
+                progress: 25,
                 message: "Generating CV...",
               });
               return result;
@@ -152,7 +164,7 @@ router.post(
             (result) => {
               sendSSE(res, {
                 step: "generating_cover_letter",
-                progress: 42,
+                progress: 35,
                 message: "Generating cover letter...",
               });
               return result;
@@ -165,7 +177,7 @@ router.post(
           ).then((result) => {
             sendSSE(res, {
               step: "generating_why_company",
-              progress: 54,
+              progress: 45,
               message: "Generating 'Why this company?' response...",
             });
             return result;
@@ -174,6 +186,18 @@ router.post(
             model,
             whyCompanyPrompt.system,
             whyCompanyPrompt.user,
+          ).then((result) => {
+            sendSSE(res, {
+              step: "generating_linkedin_message",
+              progress: 55,
+              message: "Generating LinkedIn outreach messages...",
+            });
+            return result;
+          }),
+          generateContent(
+            model,
+            linkedinMessagePrompt.system,
+            linkedinMessagePrompt.user,
           ),
         ]);
 
@@ -192,27 +216,44 @@ router.post(
         message: "Building documents...",
       });
       const format = outputFormat as OutputFormat;
-      const [resumeDoc, cvDoc, coverLetterDoc, whyCompanyDoc] =
+      const [resumeDoc, cvDoc, coverLetterDoc, whyCompanyDoc, linkedinMessageDoc] =
         await Promise.all([
           generateDocument(resumeContent, format, "Resume"),
           generateDocument(cvContent, format, "Curriculum Vitae"),
           generateDocument(coverLetterContent, format, "Cover Letter"),
           generateDocument(whyCompanyContent, format, "Why This Company"),
+          generateDocument(linkedinMessageContent, format, "LinkedIn Message"),
         ]);
 
       // Save to temp directory
       const jobId = uuidv4();
       ensureTempDir(jobId);
 
+      // Save metadata for regeneration
+      writeTempFile(
+        getTempFilePath(jobId, "meta_resume", "txt"),
+        Buffer.from(resumeText),
+      );
+      writeTempFile(
+        getTempFilePath(jobId, "meta_jd", "txt"),
+        Buffer.from(finalJobDescription),
+      );
+      writeTempFile(
+        getTempFilePath(jobId, "meta_config", "json"),
+        Buffer.from(JSON.stringify({ model, tone, outputFormat, additionalContext: additionalContext || "" })),
+      );
+
       const resumePath = getTempFilePath(jobId, "resume", format);
       const cvPath = getTempFilePath(jobId, "cv", format);
       const coverLetterPath = getTempFilePath(jobId, "cover_letter", format);
       const whyCompanyPath = getTempFilePath(jobId, "why_company", format);
+      const linkedinMessagePath = getTempFilePath(jobId, "linkedin_message", format);
 
       writeTempFile(resumePath, resumeDoc);
       writeTempFile(cvPath, cvDoc);
       writeTempFile(coverLetterPath, coverLetterDoc);
       writeTempFile(whyCompanyPath, whyCompanyDoc);
+      writeTempFile(linkedinMessagePath, linkedinMessageDoc);
 
       // Save raw markdown content for preview
       writeTempFile(
@@ -231,6 +272,10 @@ router.post(
         getTempFilePath(jobId, "why_company", "preview"),
         Buffer.from(whyCompanyContent),
       );
+      writeTempFile(
+        getTempFilePath(jobId, "linkedin_message", "preview"),
+        Buffer.from(linkedinMessageContent),
+      );
 
       const data: GenerateResponse = {
         jobId,
@@ -238,6 +283,7 @@ router.post(
         cvDownloadUrl: `/api/download/${jobId}/cv`,
         coverLetterDownloadUrl: `/api/download/${jobId}/cover_letter`,
         whyCompanyDownloadUrl: `/api/download/${jobId}/why_company`,
+        linkedinMessageDownloadUrl: `/api/download/${jobId}/linkedin_message`,
         outputFormat: format,
         atsScore,
       };

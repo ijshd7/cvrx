@@ -12,12 +12,12 @@
     "clean": "rm -rf packages/*/dist packages/*/.next packages/*/node_modules node_modules"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
-    "prettier": "^3.4.0"
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0"
   },
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@10.32.1"
 }

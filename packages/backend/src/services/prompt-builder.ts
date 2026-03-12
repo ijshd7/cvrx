@@ -14,10 +14,16 @@ export function getToneInstructions(tone: ToneStyle): string {
   }
 }
 
+function getAdditionalContextBlock(additionalContext?: string): string {
+  if (!additionalContext?.trim()) return "";
+  return `\n\nAdditional context from the candidate:\n${additionalContext.trim()}`;
+}
+
 export function buildResumePrompt(
   resumeText: string,
   jobDescription: string,
   tone: ToneStyle = "professional",
+  additionalContext?: string,
 ): { system: string; user: string } {
   return {
     system: `You are an expert resume writer and career coach. Your task is to create a tailored, ATS-optimized resume based on the candidate's existing resume and a specific job description.
@@ -63,7 +69,7 @@ Here is the job description I'm applying for:
 ${jobDescription}
 ---
 
-Please create a tailored resume optimized for this specific job posting.`,
+Please create a tailored resume optimized for this specific job posting.${getAdditionalContextBlock(additionalContext)}`,
   };
 }
 
@@ -71,6 +77,7 @@ export function buildCvPrompt(
   resumeText: string,
   jobDescription: string,
   tone: ToneStyle = "professional",
+  additionalContext?: string,
 ): { system: string; user: string } {
   return {
     system: `You are an expert CV writer and career consultant. Your task is to create a comprehensive Curriculum Vitae (CV) based on the candidate's existing resume and a specific job description.
@@ -117,7 +124,7 @@ Here is the job description for context:
 ${jobDescription}
 ---
 
-Please create a comprehensive CV that thoroughly presents my qualifications while emphasizing relevance to this position.`,
+Please create a comprehensive CV that thoroughly presents my qualifications while emphasizing relevance to this position.${getAdditionalContextBlock(additionalContext)}`,
   };
 }
 
@@ -125,6 +132,7 @@ export function buildCoverLetterPrompt(
   resumeText: string,
   jobDescription: string,
   tone: ToneStyle = "professional",
+  additionalContext?: string,
 ): { system: string; user: string } {
   return {
     system: `You are an expert cover letter writer and career coach. Your task is to create a tailored, compelling cover letter based on the candidate's existing resume and a specific job description.
@@ -164,7 +172,7 @@ Here is the job description I'm applying for:
 ${jobDescription}
 ---
 
-Please create a tailored cover letter for this specific job posting.`,
+Please create a tailored cover letter for this specific job posting.${getAdditionalContextBlock(additionalContext)}`,
   };
 }
 
@@ -172,6 +180,7 @@ export function buildWhyCompanyPrompt(
   resumeText: string,
   jobDescription: string,
   tone: ToneStyle = "professional",
+  additionalContext?: string,
 ): { system: string; user: string } {
   return {
     system: `You are a career coach helping a candidate prepare for a job interview. Your task is to write a concise, genuine answer to the question "Why do you want to work at this company?"
@@ -205,6 +214,62 @@ Here is the job description:
 ${jobDescription}
 ---
 
-Please write a 3-4 sentence answer to "Why do you want to work at this company?" that connects my background to this specific role and company.`,
+Please write a 3-4 sentence answer to "Why do you want to work at this company?" that connects my background to this specific role and company.${getAdditionalContextBlock(additionalContext)}`,
+  };
+}
+
+export function buildLinkedInMessagePrompt(
+  resumeText: string,
+  jobDescription: string,
+  tone: ToneStyle = "professional",
+  additionalContext?: string,
+): { system: string; user: string } {
+  return {
+    system: `You are an expert networking coach helping a candidate write personalized LinkedIn outreach messages to a recruiter or hiring manager for a specific role.
+
+You must generate exactly TWO messages, clearly labeled:
+
+## CONNECTION REQUEST
+- Must be under 280 characters total (this is a hard limit, LinkedIn connection requests are very short)
+- Name the specific role title
+- Include one concrete alignment point between the candidate's background and the role
+- End with a natural reason to connect, not a generic "I'd love to connect"
+- No greeting line (LinkedIn shows your name already)
+
+## INMAIL / FOLLOW-UP
+- Must be under 1800 characters total
+- Open with a brief, specific reference to why you're reaching out (the role + something specific about the company from the job description)
+- Include 2-3 concise mappings between your experience and the role's key requirements, using specific details from your resume
+- Reference something specific about the company (product, mission, tech stack, recent news mentioned in the JD) that genuinely connects to your background
+- End with a soft call to action (e.g., asking if they'd be open to a brief conversation, not demanding a meeting)
+- Keep paragraphs short (2-3 sentences max)
+
+Strict content rules:
+- Do NOT fabricate, invent, or embellish any experience, skills, or qualifications not present in the original resume
+- Extract the company name and role title from the job description. If not found, use "your team" and "this role"
+- Sound like a real person wrote this, not a template. Be specific, not generic.
+- Do NOT use phrases like "I came across your posting", "I was excited to see", "I believe I would be a great fit", or "I'd love to connect"
+
+Writing style rules (critical):
+- Do NOT use em-dashes (—). Use commas, periods, or semicolons instead.
+- Avoid overused AI-associated phrases. Do not use: "Passionate", "Dynamic", "Innovative", "Cutting-edge", "Synergy", "Leverage", "Delve", "Landscape", "Robust", "Holistic", "Pivotal", "Foster", "Facilitate", "Navigate", "Streamline", "Elevate", "Empower".
+- Write in first person
+- Keep the tone natural and direct
+
+Output both messages as plain text with the section headers "CONNECTION REQUEST" and "INMAIL / FOLLOW-UP" on their own lines. No markdown formatting beyond the headers.${getToneInstructions(tone)}`,
+
+    user: `Here is my current resume:
+
+---
+${resumeText}
+---
+
+Here is the job description:
+
+---
+${jobDescription}
+---
+
+Please write both a LinkedIn connection request message and a longer InMail/follow-up message tailored to this specific role and company.${getAdditionalContextBlock(additionalContext)}`,
   };
 }

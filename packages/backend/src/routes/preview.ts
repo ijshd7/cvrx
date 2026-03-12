@@ -6,7 +6,7 @@ const router: ReturnType<typeof Router> = Router();
 
 const paramsSchema = z.object({
   jobId: z.string().uuid(),
-  docType: z.enum(["resume", "cv", "cover_letter", "why_company"]),
+  docType: z.enum(["resume", "cv", "cover_letter", "why_company", "linkedin_message"]),
 });
 
 router.get("/preview/:jobId/:docType", (req: Request, res: Response) => {

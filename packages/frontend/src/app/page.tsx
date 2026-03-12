@@ -35,6 +35,7 @@ export default function Home() {
   const [model, setModel] = useState("");
   const [jobUrl, setJobUrl] = useState("");
   const [jobDescription, setJobDescription] = useState("");
+  const [additionalContext, setAdditionalContext] = useState("");
   const [resume, setResume] = useState<File | null>(null);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>("pdf");
   const [tone, setTone] = useState<ToneStyle>("professional");
@@ -89,6 +90,7 @@ export default function Home() {
       model,
       jobUrl,
       jobDescription,
+      additionalContext,
       resume,
       outputFormat,
       tone,
@@ -153,8 +155,10 @@ export default function Home() {
                       <JobInput
                         url={jobUrl}
                         description={jobDescription}
+                        additionalContext={additionalContext}
                         onUrlChange={setJobUrl}
                         onDescriptionChange={setJobDescription}
+                        onAdditionalContextChange={setAdditionalContext}
                       />
                     )}
                     {wizardStep === 2 && (

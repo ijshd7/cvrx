@@ -9,6 +9,7 @@ vi.mock("@/lib/api", () => ({
   getDownloadUrl: (path: string) => `http://example.com${path}`,
   getAllDownloadUrl: (jobId: string, format: string) =>
     `http://example.com/download/${jobId}/all?format=${format}`,
+  fetchPreview: vi.fn().mockResolvedValue("preview content"),
 }));
 
 // Mock the DocumentPreview component
@@ -44,6 +45,8 @@ describe("DownloadCard Component", () => {
       "/api/download/123e4567-e89b-12d3-a456-426614174000/cover_letter",
     whyCompanyDownloadUrl:
       "/api/download/123e4567-e89b-12d3-a456-426614174000/why_company",
+    linkedinMessageDownloadUrl:
+      "/api/download/123e4567-e89b-12d3-a456-426614174000/linkedin_message",
     outputFormat: "pdf",
     atsScore: {
       score: 85,
@@ -71,6 +74,7 @@ describe("DownloadCard Component", () => {
     expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     expect(screen.getByText("Cover Letter")).toBeInTheDocument();
     expect(screen.getByText("Why This Company")).toBeInTheDocument();
+    expect(screen.getByText("LinkedIn Message")).toBeInTheDocument();
     expect(screen.getAllByText("PDF")).toBeTruthy();
   });
 
@@ -84,13 +88,15 @@ describe("DownloadCard Component", () => {
     expect(screen.getByText("Curriculum Vitae")).toBeInTheDocument();
     expect(screen.getByText("Cover Letter")).toBeInTheDocument();
     expect(screen.getByText("Why This Company")).toBeInTheDocument();
+    expect(screen.getByText("LinkedIn Message")).toBeInTheDocument();
     expect(screen.getAllByText("DOCX")).toBeTruthy();
   });
 
-  it("renders five download buttons including Download All", () => {
+  it("renders download buttons including Download All", () => {
     render(<DownloadCard result={mockResult} />);
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(5);
+    // Download All + 5 download + 5 preview + 2 copy buttons = 13+
+    expect(buttons.length).toBeGreaterThanOrEqual(6);
   });
 
   it("renders Download All button with correct href", () => {
@@ -198,8 +204,8 @@ describe("DownloadCard Component", () => {
     const { container } = render(<DownloadCard result={mockResult} />);
     // Find all Eye icon buttons by finding buttons with SVG children
     const buttons = screen.getAllByRole("button");
-    // Should have: Download All + 4 download buttons + 4 preview buttons = 9 buttons
-    expect(buttons.length).toBeGreaterThanOrEqual(9);
+    // Should have: Download All + 5 download + 5 preview + 2 copy = 13 buttons
+    expect(buttons.length).toBeGreaterThanOrEqual(12);
   });
 
   it("opens preview dialog when Eye button is clicked", async () => {

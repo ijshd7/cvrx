@@ -7,6 +7,7 @@ import modelsRouter from "./routes/models";
 import generateRouter from "./routes/generate";
 import downloadRouter from "./routes/download";
 import previewRouter from "./routes/preview";
+import regenerateRouter from "./routes/regenerate";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api", modelsRouter);
 app.use("/api", generateRouter);
 app.use("/api", downloadRouter);
 app.use("/api", previewRouter);
+app.use("/api", regenerateRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {

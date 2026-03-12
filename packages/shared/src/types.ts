@@ -1,5 +1,5 @@
 export type OutputFormat = "pdf" | "docx" | "txt" | "md";
-export type DocType = "resume" | "cv" | "cover_letter" | "why_company";
+export type DocType = "resume" | "cv" | "cover_letter" | "why_company" | "linkedin_message";
 export type ToneStyle =
   | "professional"
   | "conversational"
@@ -21,6 +21,8 @@ export interface AtsScoreResult {
   matchedKeywords: string[];
   missingKeywords: string[];
   totalKeywords: number;
+  matchedPhrases?: string[];
+  missingPhrases?: string[];
 }
 
 export interface GenerateResponse {
@@ -29,6 +31,7 @@ export interface GenerateResponse {
   cvDownloadUrl: string;
   coverLetterDownloadUrl: string;
   whyCompanyDownloadUrl: string;
+  linkedinMessageDownloadUrl: string;
   outputFormat: OutputFormat;
   atsScore: AtsScoreResult;
 }
@@ -45,6 +48,7 @@ export type GenerateStep =
   | "generating_cv"
   | "generating_cover_letter"
   | "generating_why_company"
+  | "generating_linkedin_message"
   | "scoring_ats"
   | "building_documents"
   | "complete";

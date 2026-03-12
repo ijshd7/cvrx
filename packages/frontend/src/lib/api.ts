@@ -2,6 +2,7 @@ import type {
   ModelsResponse,
   GenerateResponse,
   GenerateProgressEvent,
+  DocType,
 } from "@cvrx/shared";
 
 const API_BASE = "/api";
@@ -112,5 +113,22 @@ export async function fetchPreview(
     throw new Error("Failed to fetch preview");
   }
   const data = (await res.json()) as { content: string };
+  return data.content;
+}
+
+export async function regenerateDocument(
+  jobId: string,
+  docType: DocType,
+): Promise<string> {
+  const res = await fetch(`${STREAM_API_BASE}/regenerate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jobId, docType }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: "Regeneration failed" }));
+    throw new Error(error.details || error.error || "Failed to regenerate document");
+  }
+  const data = (await res.json()) as { content: string; docType: DocType };
   return data.content;
 }

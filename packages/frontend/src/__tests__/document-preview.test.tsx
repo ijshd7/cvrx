@@ -6,6 +6,7 @@ import { DocumentPreview } from "@/components/document-preview";
 // Mock the API
 vi.mock("@/lib/api", () => ({
   fetchPreview: vi.fn(),
+  regenerateDocument: vi.fn(),
 }));
 
 import * as api from "@/lib/api";
@@ -87,7 +88,10 @@ describe("DocumentPreview Component", () => {
         screen.getByRole("tab", { name: /Cover Letter/ }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("tab", { name: /Why This Company/ }),
+        screen.getByRole("tab", { name: /Why Company/ }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("tab", { name: /LinkedIn/ }),
       ).toBeInTheDocument();
     });
   });

@@ -11,7 +11,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchPreview } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Copy, Check, RefreshCw } from "lucide-react";
+import { fetchPreview, regenerateDocument } from "@/lib/api";
 import type { DocType } from "@cvrx/shared";
 
 interface DocumentPreviewProps {
@@ -26,13 +28,15 @@ const DOC_NAMES: Record<DocType, string> = {
   cv: "Curriculum Vitae",
   cover_letter: "Cover Letter",
   why_company: "Why This Company",
+  linkedin_message: "LinkedIn Message",
 };
 
 const DOC_TABS: { docType: DocType; label: string }[] = [
   { docType: "resume", label: "Resume" },
   { docType: "cv", label: "CV" },
   { docType: "cover_letter", label: "Cover Letter" },
-  { docType: "why_company", label: "Why This Company" },
+  { docType: "why_company", label: "Why Company" },
+  { docType: "linkedin_message", label: "LinkedIn" },
 ];
 
 export function DocumentPreview({
@@ -44,6 +48,8 @@ export function DocumentPreview({
   const [currentDocType, setCurrentDocType] = useState<DocType>(initialDocType);
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -66,16 +72,75 @@ export function DocumentPreview({
 
   const handleTabChange = (docType: string) => {
     setCurrentDocType(docType as DocType);
+    setCopied(false);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Silently fail if clipboard is not available
+    }
+  };
+
+  const handleRegenerate = async () => {
+    setRegenerating(true);
+    try {
+      const newContent = await regenerateDocument(jobId, currentDocType);
+      setContent(newContent);
+    } catch (err) {
+      const error = err as Error;
+      setContent(`Error regenerating: ${error.message}`);
+    } finally {
+      setRegenerating(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>Document Preview</DialogTitle>
-          <DialogDescription>
-            Preview {DOC_NAMES[currentDocType]} before downloading
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle>Document Preview</DialogTitle>
+              <DialogDescription>
+                Preview {DOC_NAMES[currentDocType]} before downloading
+              </DialogDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRegenerate}
+                disabled={loading || regenerating}
+                className="gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${regenerating ? "animate-spin" : ""}`} />
+                {regenerating ? "Regenerating..." : "Regenerate"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCopy}
+                disabled={loading || regenerating || !content}
+                className="gap-2"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500" />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
         <Tabs
@@ -83,7 +148,7 @@ export function DocumentPreview({
           onValueChange={handleTabChange}
           className="w-full flex flex-col flex-1 min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             {DOC_TABS.map((tab) => (
               <TabsTrigger key={tab.docType} value={tab.docType}>
                 {tab.label}
@@ -97,7 +162,7 @@ export function DocumentPreview({
               value={tab.docType}
               className="flex-1 overflow-y-auto min-h-0"
             >
-              {loading ? (
+              {loading || regenerating ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

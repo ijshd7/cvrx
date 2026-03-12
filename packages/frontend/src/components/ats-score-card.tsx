@@ -63,6 +63,28 @@ export function AtsScoreCard({ score }: AtsScoreCardProps) {
         </div>
       )}
 
+      {score.matchedPhrases && score.matchedPhrases.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-xs text-muted-foreground">Matched Phrases</p>
+          <div className="flex flex-wrap gap-1">
+            {score.matchedPhrases.slice(0, 8).map((phrase) => (
+              <Badge
+                key={phrase}
+                variant="default"
+                className="bg-green-500/15 text-green-600 hover:bg-green-500/25 text-xs"
+              >
+                {phrase}
+              </Badge>
+            ))}
+            {score.matchedPhrases.length > 8 && (
+              <Badge variant="outline" className="text-xs">
+                +{score.matchedPhrases.length - 8} more
+              </Badge>
+            )}
+          </div>
+        </div>
+      )}
+
       {score.missingKeywords.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-xs text-muted-foreground">Missing Keywords</p>
@@ -79,6 +101,28 @@ export function AtsScoreCard({ score }: AtsScoreCardProps) {
             {score.missingKeywords.length > 8 && (
               <Badge variant="outline" className="text-xs">
                 +{score.missingKeywords.length - 8} more
+              </Badge>
+            )}
+          </div>
+        </div>
+      )}
+
+      {score.missingPhrases && score.missingPhrases.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-xs text-muted-foreground">Missing Phrases</p>
+          <div className="flex flex-wrap gap-1">
+            {score.missingPhrases.slice(0, 6).map((phrase) => (
+              <Badge
+                key={phrase}
+                variant="outline"
+                className="text-xs text-muted-foreground"
+              >
+                {phrase}
+              </Badge>
+            ))}
+            {score.missingPhrases.length > 6 && (
+              <Badge variant="outline" className="text-xs">
+                +{score.missingPhrases.length - 6} more
               </Badge>
             )}
           </div>

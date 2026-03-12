@@ -33,6 +33,7 @@ export function useGeneration() {
     model: string;
     jobUrl: string;
     jobDescription: string;
+    additionalContext: string;
     resume: File;
     outputFormat: OutputFormat;
     tone: ToneStyle;
@@ -57,6 +58,9 @@ export function useGeneration() {
     }
     if (params.jobDescription) {
       formData.append("jobDescription", params.jobDescription);
+    }
+    if (params.additionalContext) {
+      formData.append("additionalContext", params.additionalContext);
     }
 
     await submitGeneration(formData, {

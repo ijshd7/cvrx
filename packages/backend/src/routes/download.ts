@@ -7,7 +7,7 @@ const router: ReturnType<typeof Router> = Router();
 
 const paramsSchema = z.object({
   jobId: z.string().uuid(),
-  docType: z.enum(["resume", "cv", "cover_letter", "why_company"]),
+  docType: z.enum(["resume", "cv", "cover_letter", "why_company", "linkedin_message"]),
 });
 
 const querySchema = z.object({
@@ -22,12 +22,13 @@ const allQuerySchema = z.object({
   format: z.enum(["pdf", "docx", "txt", "md"]),
 });
 
-const DOC_TYPES = ["resume", "cv", "cover_letter", "why_company"] as const;
+const DOC_TYPES = ["resume", "cv", "cover_letter", "why_company", "linkedin_message"] as const;
 const DOC_NAMES: Record<string, string> = {
   resume: "Resume",
   cv: "Curriculum_Vitae",
   cover_letter: "Cover_Letter",
   why_company: "Why_This_Company",
+  linkedin_message: "LinkedIn_Message",
 };
 
 router.get("/download/:jobId/all", (req: Request, res: Response) => {

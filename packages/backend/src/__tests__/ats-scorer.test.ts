@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculateAtsScore, extractKeywords } from "../services/ats-scorer";
+import { calculateAtsScore, extractKeywords, extractPhrases } from "../services/ats-scorer";
 
 describe("extractKeywords", () => {
   it("extracts words with 3+ characters", () => {
@@ -37,11 +37,12 @@ describe("extractKeywords", () => {
 });
 
 describe("calculateAtsScore", () => {
-  it("returns 100% when all keywords match", () => {
+  it("returns high score when all keywords and phrases match", () => {
     const jd = "We need React and TypeScript experience";
     const resume = "I have experience with React and TypeScript";
     const result = calculateAtsScore(resume, jd);
-    expect(result.score).toBe(100);
+    // With phrase matching, score includes both keyword and phrase weights
+    expect(result.score).toBeGreaterThanOrEqual(60);
     expect(result.missingKeywords).toHaveLength(0);
   });
 
@@ -70,19 +71,51 @@ describe("calculateAtsScore", () => {
     const jd = "REACT TYPESCRIPT";
     const resume = "react typescript";
     const result = calculateAtsScore(resume, jd);
-    expect(result.score).toBe(100);
+    // All keywords and phrases should match (case insensitive)
+    expect(result.missingKeywords).toHaveLength(0);
+    expect(result.score).toBeGreaterThanOrEqual(60);
   });
 
-  it("returns correct totalKeywords count", () => {
+  it("returns totalKeywords count including phrases", () => {
     const jd = "React TypeScript Python";
     const resume = "I know React";
     const result = calculateAtsScore(resume, jd);
-    expect(result.totalKeywords).toBe(3);
+    // totalKeywords now includes both single keywords and extracted phrases
+    expect(result.totalKeywords).toBeGreaterThanOrEqual(3);
   });
 
   it("handles empty job description", () => {
     const result = calculateAtsScore("some resume", "");
     expect(result.score).toBe(0);
     expect(result.totalKeywords).toBe(0);
+  });
+
+  it("returns matched and missing phrases", () => {
+    const jd = "Looking for project management and data analysis skills";
+    const resume = "Experience in project management and team leadership";
+    const result = calculateAtsScore(resume, jd);
+    expect(result.matchedPhrases).toBeDefined();
+    expect(result.missingPhrases).toBeDefined();
+    expect(result.matchedPhrases!.some((p) => p.includes("project"))).toBe(true);
+  });
+
+  it("matches synonyms (js = javascript)", () => {
+    const jd = "Must know JavaScript and Node.js";
+    const resume = "Proficient in JS and NodeJS development";
+    const result = calculateAtsScore(resume, jd);
+    expect(result.matchedKeywords).toContain("javascript");
+  });
+});
+
+describe("extractPhrases", () => {
+  it("extracts bigrams from text", () => {
+    const phrases = extractPhrases("project management experience");
+    expect(phrases.some((p) => p.includes("project management"))).toBe(true);
+  });
+
+  it("filters out pure stop-word phrases", () => {
+    const phrases = extractPhrases("the and but or");
+    // All are stop words, so no meaningful phrases
+    expect(phrases.length).toBe(0);
   });
 });

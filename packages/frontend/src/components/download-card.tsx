@@ -16,12 +16,15 @@ import {
   BookOpen,
   Mail,
   MessageSquareText,
+  UserPlus,
   Archive,
   CheckCircle2,
   Eye,
+  Copy,
+  Check,
 } from "lucide-react";
 import type { GenerateResponse, DocType } from "@cvrx/shared";
-import { getDownloadUrl, getAllDownloadUrl } from "@/lib/api";
+import { getDownloadUrl, getAllDownloadUrl, fetchPreview } from "@/lib/api";
 import { AtsScoreCard } from "./ats-score-card";
 import { DocumentPreview } from "./document-preview";
 
@@ -33,10 +36,24 @@ export function DownloadCard({ result }: DownloadCardProps) {
   const ext = result.outputFormat.toUpperCase();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewDocType, setPreviewDocType] = useState<DocType>("resume");
+  const [copied, setCopied] = useState<Record<string, boolean>>({});
 
   const openPreview = (docType: DocType) => {
     setPreviewDocType(docType);
     setPreviewOpen(true);
+  };
+
+  const handleCopy = async (docType: DocType) => {
+    try {
+      const content = await fetchPreview(result.jobId, docType);
+      await navigator.clipboard.writeText(content);
+      setCopied((prev) => ({ ...prev, [docType]: true }));
+      setTimeout(() => {
+        setCopied((prev) => ({ ...prev, [docType]: false }));
+      }, 2000);
+    } catch {
+      // Silently fail if clipboard is not available
+    }
   };
 
   return (
@@ -204,7 +221,63 @@ export function DownloadCard({ result }: DownloadCardProps) {
             </a>
             <motion.button
               whileHover={{ scale: 1.05 }}
+              onClick={() => handleCopy("why_company")}
+              className="px-3 py-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-primary"
+            >
+              {copied["why_company"] ? (
+                <Check className="h-5 w-5 text-green-500" />
+              ) : (
+                <Copy className="h-5 w-5" />
+              )}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
               onClick={() => openPreview("why_company")}
+              className="px-3 py-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-primary"
+            >
+              <Eye className="h-5 w-5" />
+            </motion.button>
+          </div>
+
+          <div className="flex gap-2">
+            <a
+              href={getDownloadUrl(result.linkedinMessageDownloadUrl)}
+              download
+              className="flex-1 block"
+            >
+              <motion.button
+                whileHover={{ x: 4 }}
+                className="w-full flex items-center justify-between gap-4 px-4 py-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <UserPlus className="h-5 w-5 text-primary" />
+                  <div className="text-left">
+                    <p className="font-medium text-sm">LinkedIn Message</p>
+                    <p className="text-xs text-muted-foreground">{ext}</p>
+                  </div>
+                </div>
+                <motion.div
+                  whileHover={{ x: 3 }}
+                  className="text-primary group-hover:translate-x-1 transition-transform"
+                >
+                  <Download className="h-5 w-5" />
+                </motion.div>
+              </motion.button>
+            </a>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handleCopy("linkedin_message")}
+              className="px-3 py-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-primary"
+            >
+              {copied["linkedin_message"] ? (
+                <Check className="h-5 w-5 text-green-500" />
+              ) : (
+                <Copy className="h-5 w-5" />
+              )}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => openPreview("linkedin_message")}
               className="px-3 py-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-primary"
             >
               <Eye className="h-5 w-5" />
